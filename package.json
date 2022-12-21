@@ -1,0 +1,10 @@
+{
+    "name": "speed",
+    "version": "0.0.1",
+    "description": "An implementation of the card game online using the keyboard as player input for a better user experience.",
+    "type": "module",
+    "dependencies": {
+        "express": "^4.18.2",
+        "socket.io": "^4.5.4"
+    }
+}
