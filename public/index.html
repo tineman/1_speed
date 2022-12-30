@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,68 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <script type="module" src="card.js"></script>
+    <script type="module" src=game.js></script>
 </head>
 <body>
-    <header>
-        <div class="header-title-container">
-            <h1>Speed</h1>
-        </div>
-        
-    </header>
-    <main>
-        <div class="card-container">
-            <div id="card-pos-D-other">
-                D
-            </div>
-            <div id="card-pos-F-other">
-                F
-            </div>
-            <div id="card-pos-G-other">
-                G
-            </div>
-            <div id="card-pos-J-other">
-                J
-            </div>
-            <div id="card-pos-K-other">
-                K
-            </div>
-            <div id="card-pos-deck-other">
-                DECK
-            </div>
-        </div>
-        <!--
-        <div class="card-middle">
-            <div id="card-pos-left-mid">
-
-            </div>
-            <div id="card-pos-right-mid">
-
-            </div>
-        </div>
-
-        <div class="card-container">
-            <div id="card-pos-D-self">
-
-            </div>
-            <div id="card-pos-F-self">
-
-            </div>
-            <div id="card-pos-G-self">
-
-            </div>
-            <div id="card-pos-J-self">
-
-            </div>
-            <div id="card-pos-K-self">
-
-            </div>
-            <div id="card-pos-deck-self">
-
-            </div>
-        </div>
-    -->
-    </main>
-    <script src="index.js"></script>
+    <form id="input">
+        <p> Source </p> <input id="src" autocomplete="off">
+        <p> Destination </p> <input id="dst" autocomplete="off">
+        <button id="submit">Press to Submit!</button>
+    </form>
+    
 </body>
-</html>

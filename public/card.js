@@ -28,6 +28,7 @@ class Card {
     constructor(rank, suit) {
         this.rank = rank;
         this.suit = suit;
+        this.faceup = false;
     }
 }
 //Check if two cards are adjacent
@@ -73,18 +74,29 @@ function transfer(src, dst) {
 }
 //SELF to SELF and OTHER to OTHER
 //SELF to MID and OTHER to MID
-//Checks if the move is valid. Checks OTHER for AI purposes
+//Checks if the move is valid. Checks OTHER for AI purposes. This checks validity for the client and the server.
 function isValid(src, dst) {
+    //Moves a card in their own deck.
     if ((src.location == "SELF" && dst.location == "SELF") || (src.location == "OTHER" && dst.location == "OTHER")) {
+        //Cannot happen if either decks are empty, if the decks are the same, or if either of the decks are facedown
         if (src.cards.length == 0 || dst.cards.length == 0)
+            return false;
+        if (src == dst)
+            return true; //flip
+        if (!src.cards[0].faceup || !dst.cards[0].faceup)
             return false;
         return src.cards[0].rank == dst.cards[0].rank;
     }
+    //Moves a card from a player's hand to an opponent's
     else if ((src.location == "SELF" || src.location == "OTHER") && dst.location == "MID") {
-        if (src.cards.length == 0 || dst.cards.length == 0)
+        if (src.cards.length == 0 || dst.cards.length == 0 || !src.cards[0].faceup || !dst.cards[0].faceup)
             return false;
         return isAdjacent(src.cards[0], dst.cards[0]);
     }
+    //"Slaps" the middle to win. The Game checks the win condition seperately
+    else if (src.location == "MID" && dst.location == "MID")
+        return true;
+    return false;
 }
 /**
  * Deals cards from a player's deck to their five "action slots". Deals 1 to each deck, then 1 to the first 4, etc.

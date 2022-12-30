@@ -103,20 +103,31 @@ function transfer(src:Deck, dst:Deck)
 //SELF to SELF and OTHER to OTHER
 //SELF to MID and OTHER to MID
 
-//Checks if the move is valid. Checks OTHER for AI purposes
+//Checks if the move is valid. Checks OTHER for AI purposes. This checks validity for the client and the server.
 function isValid(src:Deck, dst:Deck)
 {
+
+    //Moves a card in their own deck.
     if((src.location == "SELF" && dst.location == "SELF") || (src.location == "OTHER" && dst.location == "OTHER"))
     {
+        //Cannot happen if either decks are empty, if the decks are the same, or if either of the decks are facedown
+        
         if(src.cards.length == 0 || dst.cards.length == 0) return false;
+        if(src == dst) return true; //flip
+        if(!src.cards[0].faceup || !dst.cards[0].faceup) return false;
         return src.cards[0].rank == dst.cards[0].rank;
     }
 
+    //Moves a card from a player's hand to an opponent's
     else if((src.location == "SELF" || src.location == "OTHER") && dst.location == "MID")
     {
-        if(src.cards.length == 0 || dst.cards.length == 0) return false;
+        if(src.cards.length == 0 || dst.cards.length == 0 || !src.cards[0].faceup || !dst.cards[0].faceup) return false;
         return isAdjacent(src.cards[0], dst.cards[0]);
     }
+
+    //"Slaps" the middle to win. The Game checks the win condition seperately
+    else if(src.location == "MID" && dst.location == "MID") return true;
+    return false;
 }
 
 /**
@@ -138,6 +149,54 @@ function startDeck(src:Deck, dstarr:Array<Deck>, dstindex:number)
 }
 
 export {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck};
+
+/*
+//Testing isValid
+
+console.log("Testing deck : isValid...")
+let src = new Deck("SELF");
+let dst = new Deck("SELF");
+
+
+//self to self
+
+if(isValid(src, dst)) console.log("fail0");
+
+src.cards.push(new Card(1, 1));
+dst.cards.push(new Card(1, 2));
+
+if(isValid(src, src)) console.log("fail1");
+
+if(isValid(src, dst)) console.log("fail2");
+
+src.cards[0].faceup = true;
+dst.cards[0].faceup = true;
+
+if(!isValid(src, dst)) console.log("fail3");
+
+
+
+let dst2 = new Deck("MID");
+if(isValid(src, dst2)) console.log("fail4");
+
+dst2.cards.push(new Card(13, 1));
+if(isValid(src, dst2)) console.log("fail5");
+
+dst2.cards[0].faceup = true;
+if(!isValid(src, dst2)) console.log("fail6");
+
+dst2.cards.unshift(new Card(1, 4));
+dst2.cards[0].faceup = true;
+if(isValid(src, dst2)) console.log("fail7");
+
+let mid = new Deck("MID");
+if(!isValid(mid, mid)) console.log("fail8");
+
+console.log("Finished Testing!");
+
+*/
+
+//decksrc.cards.push(new Card(1, 1));
 
 /*
 
