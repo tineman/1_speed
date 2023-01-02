@@ -59,13 +59,19 @@ function populate(deck) {
         }
     }
 }
-//Shuffles the cards
+/**
+ * Shuffle the given deck and turn all the cards facedown
+ * @param deck
+ */
 function shuffle(deck) {
     for (let i = 0; i < deck.cards.length; i++) {
         let j = Math.floor(Math.random() * deck.cards.length);
         let temp = deck.cards[i];
         deck.cards[i] = deck.cards[j];
         deck.cards[j] = temp;
+    }
+    for (let card of deck.cards) {
+        card.faceup = false;
     }
 }
 //Transfers the first card from src to dst. Asej
@@ -79,10 +85,12 @@ function isValid(src, dst) {
     //Moves a card in their own deck.
     if ((src.location == "SELF" && dst.location == "SELF") || (src.location == "OTHER" && dst.location == "OTHER")) {
         //Cannot happen if either decks are empty, if the decks are the same, or if either of the decks are facedown
-        if (src.cards.length == 0 || dst.cards.length == 0)
+        if (src.cards.length == 0)
             return false;
         if (src == dst)
             return true; //flip
+        if (dst.cards.length == 0)
+            return true; //moving onto an empty space
         if (!src.cards[0].faceup || !dst.cards[0].faceup)
             return false;
         return src.cards[0].rank == dst.cards[0].rank;
