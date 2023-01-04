@@ -82,7 +82,10 @@ function populate(deck:Deck)
     }
 }
 
-//Shuffles the cards
+/**
+ * Shuffle the given deck and turn all the cards facedown
+ * @param deck
+ */
 function shuffle(deck:Deck)
 {
     for(let i = 0; i < deck.cards.length; i++)
@@ -91,6 +94,11 @@ function shuffle(deck:Deck)
         let temp = deck.cards[i];
         deck.cards[i] = deck.cards[j];
         deck.cards[j] = temp;
+    }
+
+    for(let card of deck.cards)
+    {
+        card.faceup = false;
     }
 }
 
@@ -112,8 +120,9 @@ function isValid(src:Deck, dst:Deck)
     {
         //Cannot happen if either decks are empty, if the decks are the same, or if either of the decks are facedown
         
-        if(src.cards.length == 0 || dst.cards.length == 0) return false;
+        if(src.cards.length == 0) return false;
         if(src == dst) return true; //flip
+        if(dst.cards.length == 0) return true; //moving onto an empty space
         if(!src.cards[0].faceup || !dst.cards[0].faceup) return false;
         return src.cards[0].rank == dst.cards[0].rank;
     }
@@ -232,7 +241,7 @@ printDeck(src); //should be 1
 printDeck(dst); //should be 2, 4, 3 (top to bottom)
 
 
-
+/*
 //Testing startDeck
 //Complete deck
 

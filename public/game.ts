@@ -1,10 +1,5 @@
 import {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck} from "./Card.js"
-
-/*
-Each game gets a unique room? Or perhaps they broadcast a unique message 
-BUG - you can manipulate things that are faceup
-NOTE - check moves on clientside before sending them to server first
-*/
+import {CONSTANTS} from "./constants.js"
 
 class Game
 {
@@ -24,12 +19,7 @@ class Game
     [DS] [FS] [GS] [JS] [KS] [DECKS]
 
     index = 0   1   2   3   4   5      6      7       8   9   10  11  12  13
-    deck = [DO, FO, GO, JO, KO, DECKO, LEFTM, RIGHTN, DS, FS, GS, JS, KS, DECKS]
-
-    Game
-    - init
-    - move
-    - startDeck
+    deck = [DO, FO, GO, JO, KO, DECKO, LEFTM, RIGHTN, DS, FS, GS, JS, KS, DECKS] (6 is other-associated, 7 is self-associated)
 
     */
 
@@ -49,9 +39,9 @@ class Game
 
         this.identifier = identifier;
         this.decks = [];
-        for(let i = 0; i < 6; i++) this.decks.push(new Deck("OTHER"));
-        for(let i = 0; i < 2; i++) this.decks.push(new Deck("MID"));
-        for(let i = 0; i < 6; i++) this.decks.push(new Deck("SELF"));
+        for(let i = 0; i < 6; i++) this.decks.push(new Deck(CONSTANTS.OTHER));
+        for(let i = 0; i < 2; i++) this.decks.push(new Deck(CONSTANTS.MID));
+        for(let i = 0; i < 6; i++) this.decks.push(new Deck(CONSTANTS.SELF));
         
         let master:Deck = new Deck("Master");
         populate(master);
@@ -59,13 +49,13 @@ class Game
 
         for(let i = 0; i < 26; i++)
         {
-            transfer(master, this.decks[5]);
-            transfer(master, this.decks[13]);
+            transfer(master, this.decks[CONSTANTS.OTHER_DECK]);
+            transfer(master, this.decks[CONSTANTS.SELF_DECK]);
             
         }
 
-        startDeck(this.decks[5], this.decks, 0);
-        startDeck(this.decks[13], this.decks, 8);
+        startDeck(this.decks[CONSTANTS.OTHER_DECK], this.decks, 0);
+        startDeck(this.decks[CONSTANTS.SELF_DECK], this.decks, 8);
         
     }
 
@@ -98,63 +88,52 @@ class Game
     {
         for(let i = 0; i < 5; i++)
         {
-            this.decks[5].cards.push(...this.decks[i].cards);
-            this.decks[13].cards.push(...this.decks[i + 8].cards);
+            this.decks[CONSTANTS.OTHER_DECK].cards.push(...this.decks[i].cards);
+            this.decks[CONSTANTS.SELF_DECK].cards.push(...this.decks[i + 8].cards);
             this.decks[i].cards = [];
             this.decks[i + 8].cards = [];
         }
 
-        this.decks[5].cards.push(...this.decks[otherIndex].cards);
-        this.decks[13].cards.push(...this.decks[selfIndex].cards);
-        this.decks[6].cards = [];
-        this.decks[7].cards = [];
+        this.decks[CONSTANTS.OTHER_DECK].cards.push(...this.decks[otherIndex].cards);
+        this.decks[CONSTANTS.SELF_DECK].cards.push(...this.decks[selfIndex].cards);
+        this.decks[CONSTANTS.MID_LEFT].cards = [];
+        this.decks[CONSTANTS.MID_RIGHT].cards = [];
+
+        shuffle(this.decks[CONSTANTS.OTHER_DECK]);
+        shuffle(this.decks[CONSTANTS.SELF_DECK]);
     }
-
-
-    //TODO
-    /*
-    Unittest
-    implement send and receive decks
-    implement a terminal test
-    home: attach an error listener to teh server and client to print out diagnostics in case of a crash
-    */
-
-    /*
-    {valid: [bool],
-    data: [either a {src, dst} or a deck}
-    */
-
-        //or should there be some sort of object parser?
 
     //Move:
         //Client wants to make a move
         //Client checks isValid()?
         //If so, Client sends a json file with the src and dst using the moveRequest broadcast
         //Server receives a moverequest broadcast
-        //Server checks if the move is valid using move() and returns an object
-        //Server parses object with parse(), changing the server's state
+        //Server checks if the move is valid using move() and returns a delta
+        //Server parses delta with parse(), changing the server's state
         //Server broadcasts response to all players if valid, only original player if not
-        //Clients parse object with parse()
+        //Clients parse delta with parse()
 
         //the player should know if they are the SELF or the OTHER
 
-
     /**
      * Return an object representing the change the specified move would make to the game. This object is sent
-     * to parse() or is sent via socket.io. The only change move() makes to the state of the server is if it shuffles.
-     * @param sender either "SELF" or "OTHER"; the player who does the move
+     * to parse() or is sent to the client via socket.io.
+     * @param sender either CONSTANTS.SELF or CONSTANTS.OTHER; the player who does the move
      * @param src the index of the source deck
      * @param dst the index of the destination deck
      * @returns an object representing the changes to be made to the gamestate
      */
     move(sender:string, src:number, dst:number) 
     {
+        //No touching the opponent's decks!
+        if(sender == CONSTANTS.SELF && src < CONSTANTS.MID_LEFT) return false;
+        if(sender == CONSTANTS.OTHER && src > CONSTANTS.MID_RIGHT) return false;
 
         if(isValid(this.decks[src], this.decks[dst]))
         {
 
             //flipping a card
-            if(src == dst && (this.decks[src].location == "SELF" || this.decks[src].location == "OTHER"))
+            if(src == dst && (this.decks[src].location == CONSTANTS.SELF || this.decks[src].location == CONSTANTS.OTHER))
             {
                 //this.decks[src].cards[0].faceup = !this.decks[src].cards[0].faceup; //move
                 return {valid: true,
@@ -164,51 +143,49 @@ class Game
             }
             
             //Claiming a middle deck
-            if(src == dst && (this.decks[src].location == "MID"))
+            if(src == dst && (this.decks[src].location == CONSTANTS.MID))
             {
 
-                let second_choice_deck;
-                if(src == 6) second_choice_deck == 7;
-                else second_choice_deck == 6;
+                var second_choice_deck;
+                if(src == CONSTANTS.MID_LEFT) second_choice_deck = CONSTANTS.MID_RIGHT;
+                else second_choice_deck = CONSTANTS.MID_LEFT;
 
                 this.handIsEmpty();
 
-                if(sender == "OTHER" && this.otherempty)
+                if(sender == CONSTANTS.OTHER && this.otherempty)
                 {
-                    if(this.decks[5].cards.length == 0)
+                    if(this.decks[CONSTANTS.OTHER_DECK].cards.length == 0)
                     {
                         return {valid: true,
                         operation: "WIN",
-                        data: {winner: "OTHER"}}
+                        data: {winner: CONSTANTS.OTHER}}
                     }
-
-                    this.returnCards(src, second_choice_deck);
-
+                    
                     return {valid: true,
                     operation: "SHUFFLE",
                     data: {
-                        self: this.decks[13],
-                        other: this.decks[5]
+                        full: false,
+                        self: second_choice_deck,
+                        other: src
                     }};
                     
                 }
 
-                if(sender == "SELF" && this.selfempty)
+                if(sender == CONSTANTS.SELF && this.selfempty)
                 {
-                    if(this.decks[13].cards.length == 0)
+                    if(this.decks[CONSTANTS.SELF_DECK].cards.length == 0)
                     {
                         return {valid: true,
                         operation: "WIN",
-                        data: {winner: "SELF"}}
+                        data: {winner: CONSTANTS.SELF}}
                     }
-                    
-                    this.returnCards(second_choice_deck, src);
 
                     return {valid: true,
                     operation: "SHUFFLE",
                     data: {
-                        self: this.decks[13],
-                        other: this.decks[5]
+                        full: false,
+                        self: src,
+                        other: second_choice_deck
                     }};
                 }
 
@@ -226,7 +203,7 @@ class Game
             }
             
             //Moving a card
-            if((this.decks[src].location == "SELF" || this.decks[src].location == "OTHER") && this.decks[dst].location == "MID")
+            if((this.decks[src].location == CONSTANTS.SELF || this.decks[src].location == CONSTANTS.OTHER) && this.decks[dst].location == CONSTANTS.MID)
             {
                 //transfer(this.decks[src], this.decks[dst]); //move
                 return {valid: true,
@@ -241,11 +218,13 @@ class Game
     }
 
     /**
-     * Makes changes to the Game state as specified by delta. Assumes delta.valid == true
+     * Makes changes to the Game state as specified by delta. Assumes delta.valid == true. 
+     * When this is run on the server, it modifies the delta and the server-state. The new delta will eb sent to the client.
+     * When run on the client, it updates the client-state
      * @param win a (void) => void function to be called when a player wins
      * @param delta the object representing the change in gamestate. Assumed to be valid.
      */
-    parse(delta:Object, win:Function)
+    parse(delta:any, win:Function)
     {
         switch (delta.operation) {
             case "FLIP":
@@ -261,11 +240,52 @@ class Game
                 break;
 
             case "SHUFFLE":
-                this.decks[5] = delta.data.other;
-                this.decks[13] = delta.data.self;
+
+                if(delta.data.full)
+                {
+                    this.decks[CONSTANTS.OTHER_DECK] = delta.data.other;
+                    this.decks[CONSTANTS.SELF_DECK] = delta.data.self;
+                }
+                else
+                {
+                    delta.data.full = true;
+                    
+                    this.returnCards(delta.data.other, delta.data.self);
+
+                    delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
+                    delta.data.self = this.decks[CONSTANTS.SELF_DECK];
+                }
                 break;
 
-                
+            case "START":
+
+                if(this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0)
+                {
+                    //When neither side can make a move
+                    this.returnCards(CONSTANTS.MID_LEFT, CONSTANTS.MID_RIGHT); 
+
+                    delta = {valid: true,
+                        operation: "SHUFFLE",
+                        data: {
+                            full: true,
+                            self: this.decks[CONSTANTS.SELF_DECK],
+                            other: this.decks[CONSTANTS.OTHER_DECK]
+                        }};
+                }
+
+                if(this.decks[CONSTANTS.OTHER_DECK].cards.length != 0)
+                {
+                    transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);
+                    this.decks[CONSTANTS.MID_LEFT].cards[0].faceup = true;
+                }
+
+                if(this.decks[CONSTANTS.SELF_DECK].cards.length != 0)
+                {
+                    transfer(this.decks[CONSTANTS.SELF_DECK], this.decks[CONSTANTS.MID_RIGHT]);
+                    this.decks[CONSTANTS.MID_RIGHT].cards[0].faceup = true;
+                }
+
+                break;
         }
     }
 
@@ -277,35 +297,132 @@ class Game
         {
             if(deck.cards.length == 0) topCard.push("[EMPTY]");
             else if(!deck.cards[0].faceup) topCard.push("[FACEDOWN]");
-            else topCard.push(`[${deck.cards[0].suit} of ${deck.cards[0].rank}]`);
+            else topCard.push(`[${deck.cards[0].rank} of ${deck.cards[0].suit}]`);
         }
 
         console.log(`${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} \n mid: ${topCard[6]}, ${topCard[7]} \n ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]}`)
     }
 
-
-
-    //socket - after a shuffle, the state should be sent back to the players
-    
-
 }
-
+//Terminal game
+/* 
 let input = document.getElementById("input");
-let src = document.getElementById("src");
-let dst = document.getElementById("dst");
 
 let game = new Game("strangers to love");
 game.printState();
 
 input.addEventListener("submit", function(e){
     e.preventDefault();
-    let delta = game.move("SELF", +(src.innerText), +(dst.innerText));
+    let src = document.getElementById("src");
+    let dst = document.getElementById("dst");
+
+    console.log(`Moving from deck ${src.value} to deck ${(dst.value)}`);
+    let delta = game.move("SELF", parseInt(src.value), parseInt(dst.value));
+
     console.log(delta);
-    src.innerText = "";
-    dst.innerText = "";
+    src.value = "";
+    dst.value = "";
     game.parse(delta, () =>
     {
         console.log("Win!");
     });
     game.printState();
+});
+*/
+
+//Testing
+
+console.log("Starting all tests!");
+
+let game = new Game("we're no strangers to love");
+
+//handisempty()
+
+game.handIsEmpty();
+
+if(game.selfempty || game.otherempty) console.log("fail1");
+
+game.returnCards(6, 7);
+game.decks[CONSTANTS.OTHER_DECK] = new Deck(CONSTANTS.OTHER);
+game.decks[CONSTANTS.SELF_DECK] = new Deck(CONSTANTS.SELF);
+
+game.handIsEmpty();
+if(!game.selfempty || !game.otherempty) console.log("fail2");
+
+
+//- returncards()
+  //  - all other decks are empty
+  //  - all cards are facedown
+
+game = new Game("You know the rules, and so do I");
+game.decks[0].cards[0].faceup = true;
+game.returnCards(6, 7);
+
+for(let i = 0; i < 14; i++)
+{
+    if(i != 5 && i != 13)
+    {
+        if(game.decks[i].cards.length != 0) console.log("fail3");
+    }
+}
+
+for(let i = 0; i < 14; i++)
+{
+    for(let card of game.decks[i].cards)
+    {
+        if(card.faceup) console.log("fail4");
+    }
+}
+
+//move()
+
+let newGame = new Game("we've been together for so long");
+newGame.returnCards(6, 7);
+
+//clearing all decks
+newGame.decks[6] = new Deck(CONSTANTS.MID);
+newGame.decks[7] = new Deck(CONSTANTS.MID);
+
+newGame.decks[0].cards.push(new Card(2, 1));
+newGame.decks[1].cards.push(new Card(2, 2));
+newGame.decks[2].cards.push(new Card(3, 1));
+newGame.decks[6].cards.push(new Card(3, 2));
+newGame.decks[6].cards[0].faceup = true;
+newGame.decks[8].cards.push(new Card(3, 3));
+newGame.decks[8].cards[0].faceup = true;
+
+
+//note: move to self while one of self's decks is empty should be valid
+
+//terminate testing after an unexpected result
+
+//self to self 0 -> 1 VALID
+//self to empty self 1 -> 0 VALID
+//self to self 0 -> 2 INVALID
+
+//self to mid 0 -> 6 VALID
+//self to mid 1 -> 6 INVALID
+
+//claim middle 6 -> 6 VALID, check shuffle - SHUFFLE MAY BE INVALID? THE DELTA SHOULD HAVE A FULL = FALSE BUT HERE FULL = TRUE?
+
+let input = document.getElementById("input");
+
+newGame.printState();
+
+input!.addEventListener("submit", function(e){
+    e.preventDefault();
+    let src = <HTMLInputElement>document.getElementById("src");
+    let dst = <HTMLInputElement>document.getElementById("dst");
+
+    console.log(`Moving from deck ${src!.value} to deck ${(dst!.value)}`); //! to note variable can be null (use if you know it wont be but want to cut down on false positive ts errors)
+    let delta = newGame.move("OTHER", parseInt(src!.value), parseInt(dst!.value));
+
+    console.log(delta);
+    src!.value = "";
+    dst!.value = "";
+    newGame.parse(delta, () =>
+    {
+        console.log("Win!");
+    });
+    newGame.printState();
 });
