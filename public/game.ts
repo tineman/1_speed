@@ -1,9 +1,9 @@
 import {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck} from "./Card.js"
 import {CONSTANTS} from "./constants.js"
 
-class Game
+export default class Game
 {
-    identifier:string;
+    private identifier:string;
 
     /* Use the numbers to hit speed/center decks? space + center to claim a final deck?
 
@@ -23,9 +23,13 @@ class Game
 
     */
 
-    decks:Array<Deck>;
-    selfempty:boolean;
-    otherempty:boolean;
+    private decks:Array<Deck>;
+    private selfempty:boolean;
+    private otherempty:boolean;
+
+    private pause:boolean; //i.e. Can the clients send moves to the server?
+    private self_id:string;
+    private other_id:string;
 
     /**
      * Sets up a new game.
@@ -36,6 +40,9 @@ class Game
 
         this.selfempty = false;
         this.otherempty = false;
+        this.pause = true;
+        this.self_id = identifier;
+        this.other_id = "";
 
         this.identifier = identifier;
         this.decks = [];
@@ -53,16 +60,52 @@ class Game
             transfer(master, this.decks[CONSTANTS.SELF_DECK]);
             
         }
-
-        startDeck(this.decks[CONSTANTS.OTHER_DECK], this.decks, 0);
-        startDeck(this.decks[CONSTANTS.SELF_DECK], this.decks, 8);
         
     }
+    
+    public get getID() : string {
+        return this.identifier;
+    }
+
+    public get getSelf() : string {
+        return this.self_id;
+    }
+
+    public set setSelf(self_id) {
+        this.self_id = self_id;
+    }
+
+    public get getOther() : string {
+        return this.other_id;
+    }
+    
+    public set setOther(other_id) {
+        this.other_id = other_id;
+    }
+
+    public get getPause() : boolean {
+        return this.pause;
+    }
+
+    public set setPause(pause) {
+        this.pause = pause;
+    }
+      
+
+    /**
+     * Deals cards from each player's decks to their hands. Called before parse({valid: true, operation:"start"}))
+     */
+    public dealHand()
+    {
+        startDeck(this.decks[CONSTANTS.OTHER_DECK], this.decks, CONSTANTS.OTHER_D);
+        startDeck(this.decks[CONSTANTS.SELF_DECK], this.decks, CONSTANTS.SELF_D);
+    }
+    //FOR THE BEGINNING DELTA, YOU CAN CALL MOVE ON A NEWLY INITIALISED DECK
 
     /**
      * Checks if a player's hand is empty and sets the corresponding boolean to true
      */
-    handIsEmpty()
+    private handIsEmpty()
     {
         let empty:boolean = true;
         for(let i = 0; i < 5 && empty; i++)
@@ -84,7 +127,7 @@ class Game
      * @param otherIndex the index of the deck OTHER claims; 6 and 7 for left and right respectively
      * @param selfIndex the index of the deck SELF claims; 6 and 7 for left and right respectively
      */
-    returnCards(otherIndex:number, selfIndex:number)
+    private returnCards(otherIndex:number, selfIndex:number)
     {
         for(let i = 0; i < 5; i++)
         {
@@ -123,7 +166,7 @@ class Game
      * @param dst the index of the destination deck
      * @returns an object representing the changes to be made to the gamestate
      */
-    move(sender:string, src:number, dst:number) 
+    public move(sender:string, src:number, dst:number) 
     {
         //No touching the opponent's decks!
         if(sender == CONSTANTS.SELF && src < CONSTANTS.MID_LEFT) return false;
@@ -224,7 +267,7 @@ class Game
      * @param win a (void) => void function to be called when a player wins
      * @param delta the object representing the change in gamestate. Assumed to be valid.
      */
-    parse(delta:any, win:Function)
+    public parse(delta:any, win:Function)
     {
         switch (delta.operation) {
             case "FLIP":
@@ -254,10 +297,12 @@ class Game
 
                     delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
                     delta.data.self = this.decks[CONSTANTS.SELF_DECK];
+
+
                 }
                 break;
 
-            case "START":
+            case "START": //this is sent manually
 
                 if(this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0)
                 {
@@ -290,7 +335,7 @@ class Game
     }
 
     //Prints the state for debugging
-    printState()
+    public printState()
     {
         let topCard:Array<string> = [];
         for(let deck of this.decks)
@@ -303,12 +348,37 @@ class Game
         console.log(`${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} \n mid: ${topCard[6]}, ${topCard[7]} \n ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]}`)
     }
 
+    //return a string to display prinState() for HTML
+    public printStateHTML()
+    {
+        let topCard:Array<string> = [];
+        for(let deck of this.decks)
+        {
+            if(deck.cards.length == 0) topCard.push("[EMPTY]");
+            else if(!deck.cards[0].faceup) topCard.push("[FACEDOWN]");
+            else topCard.push(`[${deck.cards[0].rank} of ${deck.cards[0].suit}]`);
+        }
+
+        return (`OTHER: ${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} \n\n\nMID: ${topCard[6]}, ${topCard[7]} \n\n\nSELF: ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]}`)
+    }
+
+    //Prints the contents of all the cards for debugging
+    public printAll()
+    {
+        for(let deck of this.decks)
+        {
+            printDeck(deck);
+        }
+    }
+
 }
+
 //Terminal game
 /* 
 let input = document.getElementById("input");
 
 let game = new Game("strangers to love");
+game.dealHand();
 game.printState();
 
 input.addEventListener("submit", function(e){
@@ -330,11 +400,13 @@ input.addEventListener("submit", function(e){
 });
 */
 
+/*
 //Testing
 
 console.log("Starting all tests!");
 
 let game = new Game("we're no strangers to love");
+game.dealHand();
 
 //handisempty()
 
@@ -377,6 +449,7 @@ for(let i = 0; i < 14; i++)
 //move()
 
 let newGame = new Game("we've been together for so long");
+newGame.dealHand();
 newGame.returnCards(6, 7);
 
 //clearing all decks
@@ -426,3 +499,4 @@ input!.addEventListener("submit", function(e){
     });
     newGame.printState();
 });
+*/

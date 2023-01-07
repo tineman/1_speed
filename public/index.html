@@ -5,15 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    
-    <script type="module" src="card.js"></script>
-    <script type="module" src=game.js></script>
 </head>
 <body>
-    <form id="input">
-        <p> Source </p> <input type="number" id="src" autocomplete="off">
-        <p> Destination </p> <input type="number" id="dst" autocomplete="off">
-        <button id="submit">Press to Submit!</button>
-    </form>
     
+    <div id="game" hidden="hidden">
+        <p id="gamestate"> </p>
+        <form id="input">
+            <p> Source </p> <input type="number" id="src" min="0" max="13" autocomplete="off">
+            <p> Destination </p> <input type="number" id="dst" min = "0" max = "13" autocomplete="off">
+            <button id="submit">Press to Submit!</button>
+        </form>
+    </div>
+
+    <div id="menu">
+        <button id="create_game">Create Game</button> <p id="response"> </p>
+
+        <form id="join">
+            <p> Enter a gameID: </p> <input id="join_info" autocomplete="off">
+            <button id="join_submit">Join a game</button>
+        </form>
+    </div>
+
+    <!--Lesson learned: keep script after body so it loads after... amazing.-->
+    <script type="module" src="card.js"></script>
+    <script type="module" src=game.js></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="index.js"></script>
 </body>

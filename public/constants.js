@@ -38,6 +38,8 @@ export const CONSTANTS =
    SELF_G: 10,
    SELF_J: 11,
    SELF_K: 12,
-   SELF_DECK: 13
+   SELF_DECK: 13,
+
+   GAMENOTFOUND: "NOTFOUND"
 
 };
