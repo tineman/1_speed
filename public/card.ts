@@ -115,7 +115,7 @@ function transfer(src:Deck, dst:Deck)
 function isValid(src:Deck, dst:Deck)
 {
 
-    //Moves a card in their own deck.
+    //Moves a card in their own hand.
     if((src.location == "SELF" && dst.location == "SELF") || (src.location == "OTHER" && dst.location == "OTHER"))
     {
         //Cannot happen if either decks are empty, if the decks are the same, or if either of the decks are facedown

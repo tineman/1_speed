@@ -82,7 +82,7 @@ function transfer(src, dst) {
 //SELF to MID and OTHER to MID
 //Checks if the move is valid. Checks OTHER for AI purposes. This checks validity for the client and the server.
 function isValid(src, dst) {
-    //Moves a card in their own deck.
+    //Moves a card in their own hand.
     if ((src.location == "SELF" && dst.location == "SELF") || (src.location == "OTHER" && dst.location == "OTHER")) {
         //Cannot happen if either decks are empty, if the decks are the same, or if either of the decks are facedown
         if (src.cards.length == 0)

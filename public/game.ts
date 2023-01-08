@@ -168,9 +168,11 @@ export default class Game
      */
     public move(sender:string, src:number, dst:number) 
     {
-        //No touching the opponent's decks!
-        if(sender == CONSTANTS.SELF && src < CONSTANTS.MID_LEFT) return false;
-        if(sender == CONSTANTS.OTHER && src > CONSTANTS.MID_RIGHT) return false;
+        //No touching the opponent's hand!
+        if(sender == CONSTANTS.SELF && src < CONSTANTS.MID_LEFT) return {valid: false};
+        if(sender == CONSTANTS.OTHER && src > CONSTANTS.MID_RIGHT) return {valid: false};
+        //No touching your deck!
+        if(src === CONSTANTS.OTHER_DECK || src === CONSTANTS.SELF_DECK || dst === CONSTANTS.OTHER_DECK || dst === CONSTANTS.SELF_DECK) return {valid: false};
 
         if(isValid(this.decks[src], this.decks[dst]))
         {

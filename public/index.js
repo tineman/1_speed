@@ -44,7 +44,7 @@ input.addEventListener("submit", (e) => {
     }
 });
 socket.on("receive_move", (delta) => {
-    game.parse(delta, () => { console.log("Someone won, we're not sure who lmao"); });
+    game.parse(delta, () => { console.log("Someone won, we're just not sure who lmao"); });
     game.printState();
     txtgamestate.innerText = `Role: ${role}\n` + game.printStateHTML();
 });

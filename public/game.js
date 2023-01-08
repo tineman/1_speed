@@ -111,11 +111,14 @@ export default class Game {
      * @returns an object representing the changes to be made to the gamestate
      */
     move(sender, src, dst) {
-        //No touching the opponent's decks!
+        //No touching the opponent's hand!
         if (sender == CONSTANTS.SELF && src < CONSTANTS.MID_LEFT)
-            return false;
+            return { valid: false };
         if (sender == CONSTANTS.OTHER && src > CONSTANTS.MID_RIGHT)
-            return false;
+            return { valid: false };
+        //No touching your deck!
+        if (src === CONSTANTS.OTHER_DECK || src === CONSTANTS.SELF_DECK || dst === CONSTANTS.OTHER_DECK || dst === CONSTANTS.SELF_DECK)
+            return { valid: false };
         if (isValid(this.decks[src], this.decks[dst])) {
             //flipping a card
             if (src == dst && (this.decks[src].location == CONSTANTS.SELF || this.decks[src].location == CONSTANTS.OTHER)) {
