@@ -7,10 +7,6 @@ var socket = io();
 const gamediv = document.getElementById("game");
 const menudiv = document.getElementById("menu");
 
-const input = document.getElementById("input");
-const src = <HTMLInputElement> document.getElementById("src");
-const dst = <HTMLInputElement> document.getElementById("dst");
-
 const txtgamestate = document.getElementById("gamestate");
 
 const create_game = document.getElementById("create_game");
@@ -20,76 +16,84 @@ const join = document.getElementById("join");
 // ---------- Listeners ------ \\
 
 var srcindex = -1; //srcindex remembers the last index that was inputted when hold was true
-var hold = false; //
+var hold = false; 
 
 var game:Game;
 var role:string;
 
-var listener = new window.keypress.Listener();
-
-listener.simple_combo("shift s", () => {
-    console.log("You pressed shift and s");
-});
+var listener = new window.keypress.Listener(); //stop_listening when the game is empty
 
 /**
- * Return the index of the array the key refers to while accounting for the player's role.
- * Returns -1 whne called with an invalid key
- * @param key The character sent by the listener
- * @returns the index of the array the key refers to while accounting for the player's role
+ * Validates move and sends a request to the server for the corrresponding move
+ * @param src The index of the source deck
+ * @param dst The index of the destination deck
  */
-function key_to_index(key:string, role:string): number
+function sendMoveToServer(src:number, dst:number)
 {
-    if(key === "E" || key === "R" || key === "T") return CONSTANTS.MID_LEFT;
-    if(key === "Y" || key === "U" || key === "I") return CONSTANTS.MID_RIGHT;
-
-    if(role === CONSTANTS.OTHER)
+    let delta = game.move(role, src, dst);
+    if(delta.valid)
     {
-        switch (key) {
-            case "D":
-                return CONSTANTS.OTHER_D;
-
-            case "F":
-                return CONSTANTS.OTHER_F;
-
-            case "G":
-                return CONSTANTS.OTHER_G;
-
-            case "H":
-                return CONSTANTS.OTHER_G;
-
-            case "J":
-                return CONSTANTS.OTHER_J;
-
-            case "K":
-                return CONSTANTS.OTHER_K;
-        }
+        //Move listeners
+        //1) Checks if the move is valid internally
+        //2) Sends move request to server
+        socket.emit("send_move", game.getID, role, src, dst, (status) => {
+            if(!status)
+            {
+                //Fails, add sound effect and card retraction effect
+                console.log(`Move from ${src} to ${dst} has failed.`);
+            }
+            
+        });
     }
 
-    if(role === CONSTANTS.SELF)
-    {
-        switch (key) {
-            case "D":
-                return CONSTANTS.SELF_D;
-
-            case "F":
-                return CONSTANTS.SELF_F;
-
-            case "G":
-                return CONSTANTS.SELF_G;
-
-            case "H":
-                return CONSTANTS.SELF_G;
-
-            case "J":
-                return CONSTANTS.SELF_J;
-
-            case "K":
-                return CONSTANTS.SELF_K;
-        }
-    }
-    
-    return -1;
 }
+
+/**
+ * Function controlling player-input
+ * @param key The key the player pressed
+ */
+function playerInputControl(key:string)
+{
+    if(hold)
+    {
+        if(srcindex == -1) srcindex = Game.key_to_index(key, role);
+        else
+        {
+            sendMoveToServer(srcindex, Game.key_to_index(key, role));
+            srcindex = -1;
+        }
+    }
+    else
+    {
+        let flip_index = Game.key_to_index(key, role);
+        sendMoveToServer(flip_index, flip_index);
+    }
+}
+
+listener.register_combo({
+    "keys": "space",
+    "on_keydown": (event, combo, autorepeat) => {
+        console.log("space_down");
+        hold = true;
+    },
+    "on_keyup": (event, combo, autorepeat) => {
+        console.log("space_up");
+        hold = false;
+    },
+    "prevent_repeat": true
+});
+
+let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"];
+
+for(let key of valid_keys)
+{
+    listener.simple_combo(key.toLowerCase(), () => {
+        console.log(`${key} registered!`);
+        playerInputControl(key);
+    });
+}
+
+listener.stop_listening();
 
 // --------------------------- \\
 
@@ -109,31 +113,6 @@ join!.addEventListener("submit", (e) => {
     socket.emit("join_game", join_info!.value, (response) => {
         console.log(response.status); //placeholder code, the server should start a new game when a player joins
     });
-});
-
-//Move listeners
-//1) Checks if the move is valid internally
-//2) Sends move request to server
-input!.addEventListener("submit", (e) =>
-{
-    e.preventDefault();
-    console.log("input");
-
-    let srcDeck = parseInt(src.value);
-    let dstDeck = parseInt(dst.value);
-
-    let delta = game.move(role, srcDeck, dstDeck);
-    if(delta.valid)
-    {
-        socket.emit("send_move", game.getID, role, srcDeck, dstDeck, (status) => {
-            if(!status)
-            {
-                //Fails, add sound effect and card retraction effect
-                console.log(`Move from ${srcDeck} to ${dstDeck} has failed.`);
-            }
-            
-        });
-    }
 });
 
 socket.on("receive_move", (delta) => {
@@ -159,6 +138,10 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     game.parse({valid: true, operation: "START"}, () => {});
     game.printState();
     txtgamestate!.innerText = `Role: ${role}\n` + game.printStateHTML();
+
+    //
+
+    listener.listen();
     
 // ------------------------------------------ \\
 });

@@ -385,7 +385,8 @@ export default class Game
        if(key === "E" || key === "R" || key === "T") return CONSTANTS.MID_LEFT;
        if(key === "Y" || key === "U" || key === "I") return CONSTANTS.MID_RIGHT;
    
-       let valid_keys = ["D", "F", "G", "H", "J", "K"];
+       if(key === "H") key = "G";
+       let valid_keys = ["D", "F", "G", "J", "K"];
        if(!valid_keys.includes(key)) return -1;
 
        return CONSTANTS[role+"_"+key];
