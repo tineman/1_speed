@@ -1,5 +1,5 @@
-import Game from "./public/game.js";
-import { CONSTANTS } from "./public/constants.js";
+import Game from "./test/public/game.js";
+import { CONSTANTS } from "./test/public/constants.js";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -77,8 +77,8 @@ function deleteRooms(socket) {
     }
 }
 // -------- \\
-app.use(express.static(`${__dirname}/public`)); //note that this only works when the server is executed from the current dir,
-//check how to get the name of a directory in ES java
+app.use("/test", express.static(`${__dirname}/test`));
+app.use(express.static(`${__dirname}/test/public`));
 //on disconnect, delete a game, send a disconnect message and delete its room
 io.on("connection", (socket) => {
     console.log(`User with socket id ${socket.id} just connected!`);

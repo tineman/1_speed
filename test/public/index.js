@@ -1,4 +1,6 @@
+import { CONSTANTS } from "./constants.js";
 import Game from "./game.js";
+import "./keypress.js";
 var socket = io();
 const gamediv = document.getElementById("game");
 const menudiv = document.getElementById("menu");
@@ -9,8 +11,61 @@ const txtgamestate = document.getElementById("gamestate");
 const create_game = document.getElementById("create_game");
 const join_info = document.getElementById("join_info");
 const join = document.getElementById("join");
+// ---------- Listeners ------ \\
+var srcindex = -1; //srcindex remembers the last index that was inputted when hold was true
+var hold = false; //
 var game;
 var role;
+var listener = new window.keypress.Listener();
+listener.simple_combo("shift s", () => {
+    console.log("You pressed shift and s");
+});
+/**
+ * Return the index of the array the key refers to while accounting for the player's role.
+ * Returns -1 whne called with an invalid key
+ * @param key The character sent by the listener
+ * @returns the index of the array the key refers to while accounting for the player's role
+ */
+function key_to_index(key) {
+    if (key === "E" || key === "R" || key === "T")
+        return CONSTANTS.MID_LEFT;
+    if (key === "Y" || key === "U" || key === "I")
+        return CONSTANTS.MID_RIGHT;
+    if (role === CONSTANTS.OTHER) {
+        switch (key) {
+            case "D":
+                return CONSTANTS.OTHER_D;
+            case "F":
+                return CONSTANTS.OTHER_F;
+            case "G":
+                return CONSTANTS.OTHER_G;
+            case "H":
+                return CONSTANTS.OTHER_G;
+            case "J":
+                return CONSTANTS.OTHER_J;
+            case "K":
+                return CONSTANTS.OTHER_K;
+        }
+    }
+    if (role === CONSTANTS.SELF) {
+        switch (key) {
+            case "D":
+                return CONSTANTS.SELF_D;
+            case "F":
+                return CONSTANTS.SELF_F;
+            case "G":
+                return CONSTANTS.SELF_G;
+            case "H":
+                return CONSTANTS.SELF_G;
+            case "J":
+                return CONSTANTS.SELF_J;
+            case "K":
+                return CONSTANTS.SELF_K;
+        }
+    }
+    return -1;
+}
+// --------------------------- \\
 create_game.addEventListener("click", (e) => {
     e.preventDefault();
     console.log("create_game");
@@ -63,3 +118,4 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     txtgamestate.innerText = `Role: ${role}\n` + game.printStateHTML();
     // ------------------------------------------ \\
 });
+export { key_to_index };

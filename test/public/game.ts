@@ -373,6 +373,24 @@ export default class Game
         }
     }
 
+    /**
+    * Return the index of the array the key refers to while accounting for the player's role.
+    * Returns -1 whne called with an invalid key
+    * @param key The character sent by the listener
+    * @param role The role of the person inputting
+    * @returns the index of the array the key refers to while accounting for the player's role
+    */
+    public static key_to_index(key:string, role:string): number
+    {
+       if(key === "E" || key === "R" || key === "T") return CONSTANTS.MID_LEFT;
+       if(key === "Y" || key === "U" || key === "I") return CONSTANTS.MID_RIGHT;
+   
+       let valid_keys = ["D", "F", "G", "H", "J", "K"];
+       if(!valid_keys.includes(key)) return -1;
+
+       return CONSTANTS[role+"_"+key];
+    }
+
 }
 
 //Terminal game

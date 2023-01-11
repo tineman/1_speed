@@ -1,6 +1,6 @@
-import Game from "./public/game.js";
-import {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck} from "./public/Card.js"
-import {CONSTANTS} from "./public/constants.js"
+import Game from "./test/public/game.js";
+import {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck} from "./test/public/Card.js"
+import {CONSTANTS} from "./test/public/constants.js"
 
 import express from "express";
 import { createServer } from "http";
@@ -104,10 +104,8 @@ function deleteRooms(socket:Socket)
 
 // -------- \\
 
-app.use(express.static(`${__dirname}/public`)); //note that this only works when the server is executed from the current dir,
-//check how to get the name of a directory in ES java
-
-
+app.use("/test", express.static(`${__dirname}/test`));
+app.use(express.static(`${__dirname}/test/public`)); 
 
 //on disconnect, delete a game, send a disconnect message and delete its room
 
