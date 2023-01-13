@@ -1,13 +1,13 @@
-import {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck} from "./Card.js"
+import {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck} from "./card.js"
 import {CONSTANTS} from "./constants.js"
 
 export default class Game
 {
     private identifier:string;
 
-    /* Use the numbers to hit speed/center decks? space + center to claim a final deck?
+    /* 
 
-    OTHER <= location
+    OTHER
     [DO] [FO] [GO] [JO] [KO] [DECKO] <= actual variable names
 
 
@@ -52,7 +52,7 @@ export default class Game
         
         let master:Deck = new Deck("Master");
         populate(master);
-        shuffle(master);
+        shuffle(master); //revamp shuffle algorithm for better randomness
 
         for(let i = 0; i < 26; i++)
         {
@@ -100,10 +100,9 @@ export default class Game
         startDeck(this.decks[CONSTANTS.OTHER_DECK], this.decks, CONSTANTS.OTHER_D);
         startDeck(this.decks[CONSTANTS.SELF_DECK], this.decks, CONSTANTS.SELF_D);
     }
-    //FOR THE BEGINNING DELTA, YOU CAN CALL MOVE ON A NEWLY INITIALISED DECK
 
     /**
-     * Checks if a player's hand is empty and sets the corresponding boolean to true
+     * Checks if a player's hand is empty and sets the corresponding boolean accordingly
      */
     private handIsEmpty()
     {
@@ -197,7 +196,7 @@ export default class Game
 
                 this.handIsEmpty();
 
-                if(sender == CONSTANTS.OTHER && this.otherempty)
+                if((sender === CONSTANTS.OTHER) && this.otherempty)
                 {
                     if(this.decks[CONSTANTS.OTHER_DECK].cards.length == 0)
                     {
@@ -216,7 +215,7 @@ export default class Game
                     
                 }
 
-                if(sender == CONSTANTS.SELF && this.selfempty)
+                if((sender === CONSTANTS.SELF) && this.selfempty)
                 {
                     if(this.decks[CONSTANTS.SELF_DECK].cards.length == 0)
                     {
@@ -271,6 +270,7 @@ export default class Game
      */
     public parse(delta:any, win:Function)
     {
+        if (!delta.valid) console.log(`Invalid delta\n ${delta}`)
         switch (delta.operation) {
             case "FLIP":
                 this.decks[delta.data.index].cards[0].faceup = !this.decks[delta.data.index].cards[0].faceup;
@@ -288,6 +288,8 @@ export default class Game
 
                 if(delta.data.full)
                 {
+                    this.returnCards(CONSTANTS.MID_RIGHT, CONSTANTS.MID_LEFT);
+
                     this.decks[CONSTANTS.OTHER_DECK] = delta.data.other;
                     this.decks[CONSTANTS.SELF_DECK] = delta.data.self;
                 }
@@ -304,7 +306,7 @@ export default class Game
                 }
                 break;
 
-            case "START": //this is sent manually
+            case "START": //this is sent manually ERROR, YOU DO NOT CHECK FOR FULLNESS HERE
 
                 if(this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0)
                 {
@@ -393,131 +395,3 @@ export default class Game
     }
 
 }
-
-//Terminal game
-/* 
-let input = document.getElementById("input");
-
-let game = new Game("strangers to love");
-game.dealHand();
-game.printState();
-
-input.addEventListener("submit", function(e){
-    e.preventDefault();
-    let src = document.getElementById("src");
-    let dst = document.getElementById("dst");
-
-    console.log(`Moving from deck ${src.value} to deck ${(dst.value)}`);
-    let delta = game.move("SELF", parseInt(src.value), parseInt(dst.value));
-
-    console.log(delta);
-    src.value = "";
-    dst.value = "";
-    game.parse(delta, () =>
-    {
-        console.log("Win!");
-    });
-    game.printState();
-});
-*/
-
-/*
-//Testing
-
-console.log("Starting all tests!");
-
-let game = new Game("we're no strangers to love");
-game.dealHand();
-
-//handisempty()
-
-game.handIsEmpty();
-
-if(game.selfempty || game.otherempty) console.log("fail1");
-
-game.returnCards(6, 7);
-game.decks[CONSTANTS.OTHER_DECK] = new Deck(CONSTANTS.OTHER);
-game.decks[CONSTANTS.SELF_DECK] = new Deck(CONSTANTS.SELF);
-
-game.handIsEmpty();
-if(!game.selfempty || !game.otherempty) console.log("fail2");
-
-
-//- returncards()
-  //  - all other decks are empty
-  //  - all cards are facedown
-
-game = new Game("You know the rules, and so do I");
-game.decks[0].cards[0].faceup = true;
-game.returnCards(6, 7);
-
-for(let i = 0; i < 14; i++)
-{
-    if(i != 5 && i != 13)
-    {
-        if(game.decks[i].cards.length != 0) console.log("fail3");
-    }
-}
-
-for(let i = 0; i < 14; i++)
-{
-    for(let card of game.decks[i].cards)
-    {
-        if(card.faceup) console.log("fail4");
-    }
-}
-
-//move()
-
-let newGame = new Game("we've been together for so long");
-newGame.dealHand();
-newGame.returnCards(6, 7);
-
-//clearing all decks
-newGame.decks[6] = new Deck(CONSTANTS.MID);
-newGame.decks[7] = new Deck(CONSTANTS.MID);
-
-newGame.decks[0].cards.push(new Card(2, 1));
-newGame.decks[1].cards.push(new Card(2, 2));
-newGame.decks[2].cards.push(new Card(3, 1));
-newGame.decks[6].cards.push(new Card(3, 2));
-newGame.decks[6].cards[0].faceup = true;
-newGame.decks[8].cards.push(new Card(3, 3));
-newGame.decks[8].cards[0].faceup = true;
-
-
-//note: move to self while one of self's decks is empty should be valid
-
-//terminate testing after an unexpected result
-
-//self to self 0 -> 1 VALID
-//self to empty self 1 -> 0 VALID
-//self to self 0 -> 2 INVALID
-
-//self to mid 0 -> 6 VALID
-//self to mid 1 -> 6 INVALID
-
-//claim middle 6 -> 6 VALID, check shuffle - SHUFFLE MAY BE INVALID? THE DELTA SHOULD HAVE A FULL = FALSE BUT HERE FULL = TRUE?
-
-let input = document.getElementById("input");
-
-newGame.printState();
-
-input!.addEventListener("submit", function(e){
-    e.preventDefault();
-    let src = <HTMLInputElement>document.getElementById("src");
-    let dst = <HTMLInputElement>document.getElementById("dst");
-
-    console.log(`Moving from deck ${src!.value} to deck ${(dst!.value)}`); //! to note variable can be null (use if you know it wont be but want to cut down on false positive ts errors)
-    let delta = newGame.move("OTHER", parseInt(src!.value), parseInt(dst!.value));
-
-    console.log(delta);
-    src!.value = "";
-    dst!.value = "";
-    newGame.parse(delta, () =>
-    {
-        console.log("Win!");
-    });
-    newGame.printState();
-});
-*/
