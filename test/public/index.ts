@@ -9,8 +9,6 @@ var socket = io();
 const gamediv = document.getElementById("game");
 const menudiv = document.getElementById("menu");
 
-const txtgamestate = document.getElementById("gamestate");
-
 const create_game = document.getElementById("create_game");
 const join_info = <HTMLInputElement>document.getElementById("join_info");
 const join = document.getElementById("join");
