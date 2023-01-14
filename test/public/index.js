@@ -38,7 +38,7 @@ function sendMoveToServer(src, dst) {
  */
 function playerInputControl(key) {
     if (hold) {
-        if (srcindex == -1)
+        if (srcindex === -1)
             srcindex = Game.key_to_index(key, role);
         else {
             sendMoveToServer(srcindex, Game.key_to_index(key, role));
@@ -59,6 +59,14 @@ listener.register_combo({
     "on_keyup": (event, combo, autorepeat) => {
         console.log("space_up");
         hold = false;
+    },
+    "prevent_repeat": true
+});
+listener.register_combo({
+    "keys": "enter",
+    "on_keydown": (event, combo, autorepeat) => {
+        console.log("ENTER");
+        playerInputControl("ENTER");
     },
     "prevent_repeat": true
 });
@@ -100,7 +108,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     game = new Game(gameid);
     game.parse(delta, () => { });
     game.dealHand();
-    game.parse({ valid: true, operation: "START" }, () => { });
+    game.parse({ valid: true, operation: "START", data: { self: true, other: true } }, () => { });
     game.printState();
     txtgamestate.innerText = `Role: ${role}\n` + game.printStateHTML();
     //

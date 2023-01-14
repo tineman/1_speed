@@ -11,6 +11,8 @@ export default class Game {
         this.pause = true;
         this.self_id = identifier;
         this.other_id = "";
+        this.selfWantNew = false;
+        this.otherWantNew = false;
         this.identifier = identifier;
         this.decks = [];
         for (let i = 0; i < 6; i++)
@@ -47,6 +49,18 @@ export default class Game {
     }
     set setPause(pause) {
         this.pause = pause;
+    }
+    get getOtherWant() {
+        return this.otherWantNew;
+    }
+    set setOtherWant(want) {
+        this.otherWantNew = want;
+    }
+    get getSelfWant() {
+        return this.selfWantNew;
+    }
+    set setSelfWant(want) {
+        this.selfWantNew = want;
     }
     /**
      * Deals cards from each player's decks to their hands. Called before parse({valid: true, operation:"start"}))
@@ -115,17 +129,26 @@ export default class Game {
             return { valid: false };
         if (sender == CONSTANTS.OTHER && src > CONSTANTS.MID_RIGHT)
             return { valid: false };
-        //No touching your deck!
-        if (src === CONSTANTS.OTHER_DECK || src === CONSTANTS.SELF_DECK || dst === CONSTANTS.OTHER_DECK || dst === CONSTANTS.SELF_DECK)
-            return { valid: false };
+        //if(src === CONSTANTS.OTHER_DECK || src === CONSTANTS.SELF_DECK || dst === CONSTANTS.OTHER_DECK || dst === CONSTANTS.SELF_DECK) return { valid: false };
         if (isValid(this.decks[src], this.decks[dst])) {
-            //flipping a card
-            if (src == dst && (this.decks[src].location == CONSTANTS.SELF || this.decks[src].location == CONSTANTS.OTHER)) {
-                //this.decks[src].cards[0].faceup = !this.decks[src].cards[0].faceup; //move
-                return { valid: true,
-                    operation: "FLIP",
-                    data: { index: src }
-                };
+            //Requesting a switch of the middle card
+            if ((src === dst) && ((src === CONSTANTS.SELF_DECK) || (src === CONSTANTS.OTHER_DECK))) {
+                if (sender === CONSTANTS.SELF) {
+                    return { valid: true,
+                        operation: "START",
+                        data: {
+                            self: !this.getSelfWant,
+                            other: this.getOtherWant
+                        } };
+                }
+                else {
+                    return { valid: true,
+                        operation: "START",
+                        data: {
+                            self: this.getSelfWant,
+                            other: !this.getOtherWant
+                        } };
+                }
             }
             //Claiming a middle deck
             if (src == dst && (this.decks[src].location == CONSTANTS.MID)) {
@@ -164,6 +187,15 @@ export default class Game {
                         } };
                 }
                 return { valid: false };
+            }
+            if (this.decks[src].cards.length == 0)
+                return { valid: false };
+            //flipping a card
+            if (src == dst && (this.decks[src].location == CONSTANTS.SELF || this.decks[src].location == CONSTANTS.OTHER)) {
+                return { valid: true,
+                    operation: "FLIP",
+                    data: { index: src }
+                };
             }
             //moving your card in your hand
             if (this.decks[src].location == this.decks[dst].location) {
@@ -205,39 +237,51 @@ export default class Game {
                 win();
                 break;
             case "SHUFFLE":
+                this.selfWantNew = false;
+                this.otherWantNew = false;
                 if (delta.data.full) {
                     this.returnCards(CONSTANTS.MID_RIGHT, CONSTANTS.MID_LEFT);
                     this.decks[CONSTANTS.OTHER_DECK] = delta.data.other;
                     this.decks[CONSTANTS.SELF_DECK] = delta.data.self;
+                    this.dealHand();
                 }
                 else {
                     delta.data.full = true;
                     this.returnCards(delta.data.other, delta.data.self);
                     delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
                     delta.data.self = this.decks[CONSTANTS.SELF_DECK];
+                    this.dealHand();
                 }
                 break;
-            case "START": //this is sent manually ERROR, YOU DO NOT CHECK FOR FULLNESS HERE
-                if (this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0) {
-                    //When neither side can make a move
-                    this.returnCards(CONSTANTS.MID_LEFT, CONSTANTS.MID_RIGHT);
-                    delta = { valid: true,
-                        operation: "SHUFFLE",
-                        data: {
-                            full: true,
-                            self: this.decks[CONSTANTS.SELF_DECK],
-                            other: this.decks[CONSTANTS.OTHER_DECK]
-                        } };
+            case "START":
+                if (delta.data.self && delta.data.other) {
+                    this.selfWantNew = false;
+                    this.otherWantNew = false;
+                    if (this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0) {
+                        //When neither side can make a move
+                        this.returnCards(CONSTANTS.MID_LEFT, CONSTANTS.MID_RIGHT);
+                        delta = { valid: true,
+                            operation: "SHUFFLE",
+                            data: {
+                                full: true,
+                                self: this.decks[CONSTANTS.SELF_DECK],
+                                other: this.decks[CONSTANTS.OTHER_DECK]
+                            } };
+                    }
+                    if (this.decks[CONSTANTS.OTHER_DECK].cards.length != 0) {
+                        transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);
+                        this.decks[CONSTANTS.MID_LEFT].cards[0].faceup = true;
+                    }
+                    if (this.decks[CONSTANTS.SELF_DECK].cards.length != 0) {
+                        transfer(this.decks[CONSTANTS.SELF_DECK], this.decks[CONSTANTS.MID_RIGHT]);
+                        this.decks[CONSTANTS.MID_RIGHT].cards[0].faceup = true;
+                    }
+                    break;
                 }
-                if (this.decks[CONSTANTS.OTHER_DECK].cards.length != 0) {
-                    transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);
-                    this.decks[CONSTANTS.MID_LEFT].cards[0].faceup = true;
+                else {
+                    this.selfWantNew = delta.data.self;
+                    this.otherWantNew = delta.data.other;
                 }
-                if (this.decks[CONSTANTS.SELF_DECK].cards.length != 0) {
-                    transfer(this.decks[CONSTANTS.SELF_DECK], this.decks[CONSTANTS.MID_RIGHT]);
-                    this.decks[CONSTANTS.MID_RIGHT].cards[0].faceup = true;
-                }
-                break;
         }
     }
     //Prints the state for debugging
@@ -251,7 +295,7 @@ export default class Game {
             else
                 topCard.push(`[${deck.cards[0].rank} of ${deck.cards[0].suit}]`);
         }
-        console.log(`${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} \n mid: ${topCard[6]}, ${topCard[7]} \n ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]}`);
+        console.log(`${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} Flip: ${this.otherWantNew} \n mid: ${topCard[6]}, ${topCard[7]} \n ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]} Flip: ${this.selfWantNew}`);
     }
     //return a string to display prinState() for HTML
     printStateHTML() {
@@ -264,7 +308,7 @@ export default class Game {
             else
                 topCard.push(`[${deck.cards[0].rank} of ${deck.cards[0].suit}]`);
         }
-        return (`OTHER: ${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} \n\n\nMID: ${topCard[6]}, ${topCard[7]} \n\n\nSELF: ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]}`);
+        return (`OTHER: ${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} Flip: ${this.otherWantNew} \n\n\nMID: ${topCard[6]}, ${topCard[7]} \n\n\nSELF: ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]} Flip: ${this.selfWantNew}`);
     }
     //Prints the contents of all the cards for debugging
     printAll() {
@@ -280,6 +324,10 @@ export default class Game {
     * @returns the index of the array the key refers to while accounting for the player's role
     */
     static key_to_index(key, role) {
+        if (key === "ENTER" && role === CONSTANTS.SELF)
+            return CONSTANTS.SELF_DECK;
+        if (key === "ENTER" && role === CONSTANTS.OTHER)
+            return CONSTANTS.OTHER_DECK;
         if (key === "E" || key === "R" || key === "T")
             return CONSTANTS.MID_LEFT;
         if (key === "Y" || key === "U" || key === "I")

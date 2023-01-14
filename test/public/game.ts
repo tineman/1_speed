@@ -31,6 +31,9 @@ export default class Game
     private self_id:string;
     private other_id:string;
 
+    private selfWantNew:boolean;
+    private otherWantNew:boolean;
+
     /**
      * Sets up a new game.
      * @param identifier The unique identifier attached to this Game
@@ -43,6 +46,8 @@ export default class Game
         this.pause = true;
         this.self_id = identifier;
         this.other_id = "";
+        this.selfWantNew = false;
+        this.otherWantNew = false;
 
         this.identifier = identifier;
         this.decks = [];
@@ -89,6 +94,22 @@ export default class Game
 
     public set setPause(pause) {
         this.pause = pause;
+    }
+
+    public get getOtherWant() {
+        return this.otherWantNew
+    }
+
+    public set setOtherWant(want: boolean) {
+        this.otherWantNew = want;
+    }
+
+    public get getSelfWant() {
+        return this.selfWantNew;
+    }
+
+    public set setSelfWant(want: boolean) {
+        this.selfWantNew = want;
     }
       
 
@@ -170,20 +191,31 @@ export default class Game
         //No touching the opponent's hand!
         if(sender == CONSTANTS.SELF && src < CONSTANTS.MID_LEFT) return {valid: false};
         if(sender == CONSTANTS.OTHER && src > CONSTANTS.MID_RIGHT) return {valid: false};
-        //No touching your deck!
-        if(src === CONSTANTS.OTHER_DECK || src === CONSTANTS.SELF_DECK || dst === CONSTANTS.OTHER_DECK || dst === CONSTANTS.SELF_DECK) return {valid: false};
+        //if(src === CONSTANTS.OTHER_DECK || src === CONSTANTS.SELF_DECK || dst === CONSTANTS.OTHER_DECK || dst === CONSTANTS.SELF_DECK) return { valid: false };
 
         if(isValid(this.decks[src], this.decks[dst]))
         {
-
-            //flipping a card
-            if(src == dst && (this.decks[src].location == CONSTANTS.SELF || this.decks[src].location == CONSTANTS.OTHER))
+            //Requesting a switch of the middle card
+            if((src === dst) && ((src === CONSTANTS.SELF_DECK) || (src === CONSTANTS.OTHER_DECK)))
             {
-                //this.decks[src].cards[0].faceup = !this.decks[src].cards[0].faceup; //move
-                return {valid: true,
-                    operation: "FLIP",
-                    data: {index: src}
-                };
+                if(sender === CONSTANTS.SELF)
+                {
+                    return {valid: true,
+                        operation: "START",
+                        data: {
+                            self: !this.getSelfWant,
+                            other: this.getOtherWant
+                        }};
+                }
+                else
+                {
+                    return {valid: true,
+                        operation: "START",
+                        data: {
+                            self: this.getSelfWant,
+                            other: !this.getOtherWant
+                        }}; 
+                }
             }
             
             //Claiming a middle deck
@@ -236,6 +268,17 @@ export default class Game
                 return {valid: false};
             }
 
+            if(this.decks[src].cards.length == 0) return {valid: false};
+
+            //flipping a card
+            if(src == dst && (this.decks[src].location == CONSTANTS.SELF || this.decks[src].location == CONSTANTS.OTHER))
+            {
+                return {valid: true,
+                    operation: "FLIP",
+                    data: {index: src}
+                };
+            }
+
             //moving your card in your hand
             if (this.decks[src].location == this.decks[dst].location)
             {
@@ -285,13 +328,16 @@ export default class Game
                 break;
 
             case "SHUFFLE":
-
+                this.selfWantNew = false;
+                this.otherWantNew = false;
                 if(delta.data.full)
                 {
                     this.returnCards(CONSTANTS.MID_RIGHT, CONSTANTS.MID_LEFT);
 
                     this.decks[CONSTANTS.OTHER_DECK] = delta.data.other;
                     this.decks[CONSTANTS.SELF_DECK] = delta.data.self;
+
+                    this.dealHand();
                 }
                 else
                 {
@@ -302,39 +348,51 @@ export default class Game
                     delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
                     delta.data.self = this.decks[CONSTANTS.SELF_DECK];
 
-
+                    this.dealHand();
                 }
                 break;
 
-            case "START": //this is sent manually ERROR, YOU DO NOT CHECK FOR FULLNESS HERE
+            case "START":
 
-                if(this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0)
+                if(delta.data.self && delta.data.other)
                 {
-                    //When neither side can make a move
-                    this.returnCards(CONSTANTS.MID_LEFT, CONSTANTS.MID_RIGHT); 
+                    this.selfWantNew = false;
+                    this.otherWantNew = false;
+                    
+                    if(this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0)
+                    {
+                        //When neither side can make a move
+                        this.returnCards(CONSTANTS.MID_LEFT, CONSTANTS.MID_RIGHT); 
 
-                    delta = {valid: true,
-                        operation: "SHUFFLE",
-                        data: {
-                            full: true,
-                            self: this.decks[CONSTANTS.SELF_DECK],
-                            other: this.decks[CONSTANTS.OTHER_DECK]
-                        }};
+                        delta = {valid: true,
+                            operation: "SHUFFLE",
+                            data: {
+                                full: true,
+                                self: this.decks[CONSTANTS.SELF_DECK],
+                                other: this.decks[CONSTANTS.OTHER_DECK]
+                            }};
+                    }
+
+                    if(this.decks[CONSTANTS.OTHER_DECK].cards.length != 0)
+                    {
+                        transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);
+                        this.decks[CONSTANTS.MID_LEFT].cards[0].faceup = true;
+                    }
+
+                    if(this.decks[CONSTANTS.SELF_DECK].cards.length != 0)
+                    {
+                        transfer(this.decks[CONSTANTS.SELF_DECK], this.decks[CONSTANTS.MID_RIGHT]);
+                        this.decks[CONSTANTS.MID_RIGHT].cards[0].faceup = true;
+                    }
+
+                    break;
+
                 }
-
-                if(this.decks[CONSTANTS.OTHER_DECK].cards.length != 0)
+                else
                 {
-                    transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);
-                    this.decks[CONSTANTS.MID_LEFT].cards[0].faceup = true;
+                    this.selfWantNew = delta.data.self;
+                    this.otherWantNew = delta.data.other;
                 }
-
-                if(this.decks[CONSTANTS.SELF_DECK].cards.length != 0)
-                {
-                    transfer(this.decks[CONSTANTS.SELF_DECK], this.decks[CONSTANTS.MID_RIGHT]);
-                    this.decks[CONSTANTS.MID_RIGHT].cards[0].faceup = true;
-                }
-
-                break;
         }
     }
 
@@ -349,7 +407,7 @@ export default class Game
             else topCard.push(`[${deck.cards[0].rank} of ${deck.cards[0].suit}]`);
         }
 
-        console.log(`${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} \n mid: ${topCard[6]}, ${topCard[7]} \n ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]}`)
+        console.log(`${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} Flip: ${this.otherWantNew} \n mid: ${topCard[6]}, ${topCard[7]} \n ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]} Flip: ${this.selfWantNew}`)
     }
 
     //return a string to display prinState() for HTML
@@ -363,7 +421,7 @@ export default class Game
             else topCard.push(`[${deck.cards[0].rank} of ${deck.cards[0].suit}]`);
         }
 
-        return (`OTHER: ${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} \n\n\nMID: ${topCard[6]}, ${topCard[7]} \n\n\nSELF: ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]}`)
+        return (`OTHER: ${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} Flip: ${this.otherWantNew} \n\n\nMID: ${topCard[6]}, ${topCard[7]} \n\n\nSELF: ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]} Flip: ${this.selfWantNew}`)
     }
 
     //Prints the contents of all the cards for debugging
@@ -384,6 +442,9 @@ export default class Game
     */
     public static key_to_index(key:string, role:string): number
     {
+        if(key === "ENTER" && role === CONSTANTS.SELF) return CONSTANTS.SELF_DECK;
+        if(key === "ENTER" && role === CONSTANTS.OTHER) return CONSTANTS.OTHER_DECK;
+
        if(key === "E" || key === "R" || key === "T") return CONSTANTS.MID_LEFT;
        if(key === "Y" || key === "U" || key === "I") return CONSTANTS.MID_RIGHT;
    

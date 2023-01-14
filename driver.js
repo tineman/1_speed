@@ -82,7 +82,9 @@ app.use(express.static(`${__dirname}/test/public`));
 //on disconnect, delete a game, send a disconnect message and delete its room
 io.on("connection", (socket) => {
     console.log(`User with socket id ${socket.id} just connected!`);
-    console.log(games);
+    for (let game of games) {
+        game.printAll();
+    }
     socket.on("create_game", (callback) => {
         if (findGame(socket.id).getID === CONSTANTS.GAMENOTFOUND) {
             // ------------------------------------------ \\
@@ -119,7 +121,7 @@ io.on("connection", (socket) => {
             io.to(gameid).emit("start_game", delta, gameid, roles); //put some of this in a function
             game.setPause = false;
             game.dealHand();
-            game.parse({ valid: true, operation: "START" }, () => { });
+            game.parse({ valid: true, operation: "START", data: { self: true, other: true } }, () => { });
             // ------------------------------------------ \\
             game.printAll();
             callback({ status: `Joined game!` });

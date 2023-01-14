@@ -111,7 +111,6 @@ app.use(express.static(`${__dirname}/test/public`));
 
 io.on("connection", (socket) => { //when joining or creating a game, they should be taken out of every other socketio room
     console.log(`User with socket id ${socket.id} just connected!`);
-    console.log(games);
 
     socket.on("create_game", (callback) => {
 
@@ -169,7 +168,7 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
             io.to(gameid).emit("start_game", delta, gameid, roles); //put some of this in a function
             game.setPause = false;
             game.dealHand();
-            game.parse({valid: true, operation: "START"}, () => {});
+            game.parse({valid: true, operation: "START", data: {self: true, other: true}}, () => {});
 
             // ------------------------------------------ \\
 

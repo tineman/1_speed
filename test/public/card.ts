@@ -118,9 +118,8 @@ function isValid(src:Deck, dst:Deck)
     //Moves a card in their own hand.
     if((src.location == "SELF" && dst.location == "SELF") || (src.location == "OTHER" && dst.location == "OTHER"))
     {
-        //Cannot happen if either decks are empty, if the decks are the same, or if either of the decks are facedown
+        //Cannot happen if the decks are the same, or if either of the decks are facedown
         
-        if(src.cards.length == 0) return false;
         if(src == dst) return true; //flip
         if(dst.cards.length == 0) return true; //moving onto an empty space
         if(!src.cards[0].faceup || !dst.cards[0].faceup) return false;
