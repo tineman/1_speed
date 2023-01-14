@@ -105,6 +105,7 @@ function shuffle(deck:Deck)
 //Transfers the first card from src to dst. Asej
 function transfer(src:Deck, dst:Deck)
 {
+    //@ts-ignore
     dst.cards.unshift(src.cards.shift());
 }
 

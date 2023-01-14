@@ -1,5 +1,4 @@
 import Game from "./test/public/game.js";
-import {Card, isAdjacent, Deck, printDeck, populate, shuffle, transfer, isValid, startDeck} from "./test/public/Card.js"
 import {CONSTANTS} from "./test/public/constants.js"
 
 import express from "express";
@@ -165,7 +164,8 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
             let delta = game.move(CONSTANTS.SELF, 6, 6);
             game.parse(delta, () => {}); //parse and then emit
             let roles = JSON.parse(`{"${game.getSelf}":"${CONSTANTS.SELF}", "${game.getOther}":"${CONSTANTS.OTHER}"}`)
-            io.to(gameid).emit("start_game", delta, gameid, roles); //put some of this in a function
+            console.log(delta); //11 cards
+            io.to(gameid).emit("start_game", delta, gameid, roles);
             game.setPause = false;
             game.dealHand();
             game.parse({valid: true, operation: "START", data: {self: true, other: true}}, () => {});

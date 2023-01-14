@@ -1,7 +1,9 @@
+import { updateHTML } from "./animation.js";
 import { CONSTANTS } from "./constants.js";
 import Game from "./game.js";
 import "./keypress.js"
 
+//@ts-ignore
 var socket = io();
 
 const gamediv = document.getElementById("game");
@@ -21,6 +23,7 @@ var hold = false;
 var game:Game;
 var role:string;
 
+//@ts-ignore
 var listener = new window.keypress.Listener(); //stop_listening when the game is empty
 
 /**
@@ -129,7 +132,13 @@ join!.addEventListener("submit", (e) => {
 socket.on("receive_move", (delta) => {
     game.parse(delta, () => {console.log("Someone won, we're just not sure who lmao")});
     game.printState();
-    txtgamestate!.innerText = `Role: ${role}\n` + game.printStateHTML();
+    
+    let gameState = game.getState();
+    for(let i = 0; i < 14; i++)
+    {
+        updateHTML(i, gameState[i]);
+    }
+    
 })
 
 // ------------------------------------------ \\
@@ -148,7 +157,12 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     game.dealHand();
     game.parse({valid: true, operation: "START", data: {self: true, other: true}}, () => {});
     game.printState();
-    txtgamestate!.innerText = `Role: ${role}\n` + game.printStateHTML();
+    
+    let gameState = game.getState();
+    for(let i = 0; i < 14; i++)
+    {
+        updateHTML(i, gameState[i]);
+    }
 
     //
 

@@ -76,6 +76,7 @@ function shuffle(deck) {
 }
 //Transfers the first card from src to dst. Asej
 function transfer(src, dst) {
+    //@ts-ignore
     dst.cards.unshift(src.cards.shift());
 }
 //SELF to SELF and OTHER to OTHER

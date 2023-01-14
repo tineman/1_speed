@@ -337,7 +337,7 @@ export default class Game
                     this.decks[CONSTANTS.OTHER_DECK] = delta.data.other;
                     this.decks[CONSTANTS.SELF_DECK] = delta.data.self;
 
-                    this.dealHand();
+                    //this.dealHand();
                 }
                 else
                 {
@@ -348,7 +348,7 @@ export default class Game
                     delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
                     delta.data.self = this.decks[CONSTANTS.SELF_DECK];
 
-                    this.dealHand();
+                    //this.dealHand();
                 }
                 break;
 
@@ -411,17 +411,16 @@ export default class Game
     }
 
     //return a string to display prinState() for HTML
-    public printStateHTML()
+    public getState()
     {
-        let topCard:Array<string> = [];
+        let topCard:Array<Card> = [];
         for(let deck of this.decks)
         {
-            if(deck.cards.length == 0) topCard.push("[EMPTY]");
-            else if(!deck.cards[0].faceup) topCard.push("[FACEDOWN]");
-            else topCard.push(`[${deck.cards[0].rank} of ${deck.cards[0].suit}]`);
+            if(deck.cards.length == 0) topCard.push(new Card(0, 0));
+            else topCard.push(deck.cards[0]);
         }
 
-        return (`OTHER: ${topCard[0]}, ${topCard[1]}, ${topCard[2]}, ${topCard[3]}, ${topCard[4]} Deck: ${topCard[5]} Flip: ${this.otherWantNew} \n\n\nMID: ${topCard[6]}, ${topCard[7]} \n\n\nSELF: ${topCard[8]}, ${topCard[9]}, ${topCard[10]}, ${topCard[11]}, ${topCard[12]} Deck: ${topCard[13]} Flip: ${this.selfWantNew}`)
+        return topCard
     }
 
     //Prints the contents of all the cards for debugging
