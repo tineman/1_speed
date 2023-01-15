@@ -145,8 +145,9 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
 
     //start_game   ------------------------------ \\
     //Client: Hide menu and show gamediv, receive gamestate, start game internally
-    gamediv!.removeAttribute("hidden");
-    menudiv!.setAttribute("hidden", "hidden");
+
+    gamediv!.style.display = "flex";
+    menudiv!.style.display = "none";
 
     role = assignedRole[socket.id];
 

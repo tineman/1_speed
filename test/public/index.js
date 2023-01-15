@@ -5,7 +5,6 @@ import "./keypress.js";
 var socket = io();
 const gamediv = document.getElementById("game");
 const menudiv = document.getElementById("menu");
-const txtgamestate = document.getElementById("gamestate");
 const create_game = document.getElementById("create_game");
 const join_info = document.getElementById("join_info");
 const join = document.getElementById("join");
@@ -108,8 +107,8 @@ socket.on("receive_move", (delta) => {
 socket.on("start_game", (delta, gameid, assignedRole) => {
     //start_game   ------------------------------ \\
     //Client: Hide menu and show gamediv, receive gamestate, start game internally
-    gamediv.removeAttribute("hidden");
-    menudiv.setAttribute("hidden", "hidden");
+    gamediv.style.display = "flex";
+    menudiv.style.display = "none";
     role = assignedRole[socket.id];
     game = new Game(gameid);
     game.parse(delta, () => { });
