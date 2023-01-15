@@ -85,7 +85,7 @@ create_game.addEventListener("click", (e) => {
     e.preventDefault();
     console.log("create_game");
     socket.emit("create_game", (response) => {
-        document.getElementById("response").innerText = response.status; //you cant set the innertext if it was originally "", you have to set it to " "
+        create_game.innerText = response.status; //you cant set the innertext if it was originally "", you have to set it to " "
     });
 });
 join.addEventListener("submit", (e) => {

@@ -1,7 +1,59 @@
 * 
 {
+	font-family: "VT323";
+	color: #ffffff;
 	overflow: hidden;
   	box-sizing: border-box;
+}
+
+h1
+{
+	font-size: 6.4rem;
+	display: inline;
+	
+}
+p
+{
+	font-size: 1.6rem;
+	display: inline;
+}
+
+@keyframes blink {
+  50% {opacity:0}
+}
+
+#cursor
+{
+	animation-name:blink;
+	animation-duration:1.5s;
+	animation-iteration-count:infinite;
+	animation-timing-function:steps(1, jump-end);
+}
+
+#menu
+{
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	height: 60%
+}
+
+.options
+{
+	margin-top: 8px;
+}
+
+.light-blue-back
+{
+	background-color: #20343d;
+	border:none;
+	font-size: 1.6rem;
+}
+
+.light-blue-back:active
+{
+	background-color: #1B2A31;
 }
 
 html
