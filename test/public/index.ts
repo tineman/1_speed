@@ -50,28 +50,41 @@ function sendMoveToServer(src:number, dst:number)
 }
 
 /**
- * Function controlling player-input
+ * Deceides if the input is a player flipping cards or if it is a player moving cards
  * @param key The key the player pressed
  */
 function playerInputControl(key:string)
 {
+    let newindex = Game.key_to_index(key, role)
 
     if(hold)
     {
-        if(srcindex === -1) srcindex = Game.key_to_index(key, role);
-        else
+        if(srcindex === -1)
         {
-            sendMoveToServer(srcindex, Game.key_to_index(key, role));
-            srcindex = -1;
+            srcindex = newindex;
+            return;
         }
+
+        //Prevents the controller retaining a middle deck as a source
+        if((srcindex === CONSTANTS.MID_LEFT || srcindex === CONSTANTS.MID_RIGHT) && (newindex < CONSTANTS.MID_LEFT || newindex > CONSTANTS.MID_RIGHT))
+        {
+            srcindex = newindex;
+            return;
+        }
+        
+        sendMoveToServer(srcindex, newindex);
+        srcindex = -1;
+        
     }
     else
     {
-        let flip_index = Game.key_to_index(key, role);
-        sendMoveToServer(flip_index, flip_index);
+        sendMoveToServer(newindex, newindex);
     }
 }
 
+/**
+ * Adding listeners to keys
+ */
 listener.register_combo({
     "keys": "space",
     "on_keydown": (event, combo, autorepeat) => {
@@ -109,15 +122,21 @@ listener.stop_listening();
 
 // --------------------------- \\
 
+/**
+ * Runs when Create Game is clicked. Requests the server to create a game and prints output on the button
+ */
 create_game!.addEventListener("click", (e) => {
     e.preventDefault();
     console.log("create_game");
 
     socket.emit("create_game", (response) => {
-        create_game!.innerText = response.status; //you cant set the innertext if it was originally "", you have to set it to " "
+        create_game!.innerText = response.status;
     });
 });
 
+/**
+ * Requests server to join a game with the givenID
+ */
 join!.addEventListener("submit", (e) => {
     e.preventDefault();
     console.log("join!");
@@ -127,6 +146,9 @@ join!.addEventListener("submit", (e) => {
     });
 });
 
+/**
+ * Reponds to the server broadcasting a move.
+ */
 socket.on("receive_move", (delta) => {
     game.parse(delta, () => {console.log("Someone won, we're just not sure who lmao")});
     game.printState();
@@ -141,6 +163,9 @@ socket.on("receive_move", (delta) => {
 
 // ------------------------------------------ \\
 
+/**
+ * Responds to the server broadcasting a new game. Hides the menu, initializes the game and starts the game.
+ */
 socket.on("start_game", (delta, gameid, assignedRole) => {
 
     //start_game   ------------------------------ \\

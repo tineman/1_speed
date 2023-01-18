@@ -27,6 +27,7 @@ function flipHands(game)
 
 QUnit.module("Game - handIsEmpty()");
 
+    //HandisEmpty on empty hand
     QUnit.test("Game initialisaiton", function(assert) {
         let game = new Game("Test");
         game.handIsEmpty();
@@ -35,6 +36,7 @@ QUnit.module("Game - handIsEmpty()");
         assert.true(game.otherempty);
     });
 
+    //handIsEmpty on two full hands
     QUnit.test("Game start", function(assert) {
         let game = new Game("Test");
         game.dealHand();
@@ -44,6 +46,7 @@ QUnit.module("Game - handIsEmpty()");
         assert.false(game.otherempty);
     });
 
+    //HandIsEmpty on one full and one empty hand
     QUnit.test("Midgame", function(assert) {
         let game = new Game("Test");
         game.dealHand();
@@ -57,6 +60,7 @@ QUnit.module("Game - handIsEmpty()");
         assert.true(game.otherempty);
     });
 
+    //Forall: Simply check delta is expected
 QUnit.module("Game - move()");
 
     QUnit.test("Flip own card", function(assert) {
@@ -100,6 +104,7 @@ QUnit.module("Game - move()");
         assert.deepEqual(delta, {valid: false});
     });
 
+    //Play to a gamestate where deck-claiming is valid before calling move()
     QUnit.test("Claim middle and redraw decks", function(assert) {
         let game = sampleGame();
         game = flipHands(game);
@@ -115,6 +120,7 @@ QUnit.module("Game - move()");
         assert.deepEqual(delta, {valid: true, operation: "SHUFFLE", data: {full: false, self: CONSTANTS.MID_RIGHT, other: CONSTANTS.MID_LEFT}});
     });
 
+    //Play to a gamestate where deck-claiming is valid before calling move()
     QUnit.test("Claim middle and win", function(assert) {
         let game = sampleGame();
         game = flipHands(game);
@@ -160,7 +166,7 @@ QUnit.module("Game - parse()");
         game.parse(delta, () => {});
 
         assert.expect(2);
-        assert.equal(game.decks[CONSTANTS.SELF_J].cards.length, 0);
+        assert.equal(game.decks[CONSTANTS.SELF_J].cards.length, 0); //check src and dst decks
         let correctcard = new Card(2, 2);
         correctcard.faceup = true;
         assert.propEqual(game.decks[CONSTANTS.SELF_K].cards[0], correctcard);
@@ -172,7 +178,7 @@ QUnit.module("Game - parse()");
         game.parse(delta, () => {});
 
         assert.expect(2);
-        assert.equal(game.decks[CONSTANTS.SELF_F].cards.length, 0);
+        assert.equal(game.decks[CONSTANTS.SELF_F].cards.length, 0); //check src and dst decks
         let correctcard = new Card(3, 1);
         correctcard.faceup = true;
         assert.propEqual(game.decks[CONSTANTS.SELF_D].cards[0], correctcard);
@@ -184,7 +190,7 @@ QUnit.module("Game - parse()");
         game.parse(delta, () => {});
 
         assert.expect(2);
-        assert.equal(game.decks[CONSTANTS.SELF_G].cards.length, 0);
+        assert.equal(game.decks[CONSTANTS.SELF_G].cards.length, 0); //check src and dst decks
         let correctcard = new Card(1, 2);
         correctcard.faceup = true;
         assert.propEqual(game.decks[CONSTANTS.MID_LEFT].cards[0], correctcard);
@@ -205,7 +211,7 @@ QUnit.module("Game - parse()");
 
         game.handIsEmpty();
 
-        assert.expect(5);
+        assert.expect(5); //Check hand is in deck and deck has the correct number of cards
         assert.ok(game.otherempty);
         assert.ok(game.selfempty);
 
@@ -223,7 +229,7 @@ QUnit.module("Game - parse()");
         assert.expect(4);
 
         game.handIsEmpty(); 
-        assert.ok(game.otherempty);
+        assert.ok(game.otherempty); //Check hand is in deck and that client updated their decks correctly
         assert.ok(game.selfempty);
 
         assert.propEqual(game.decks[CONSTANTS.SELF_DECK], JSON.parse(`{"location":"SELF","cards":[{"rank":2,"suit":2,"faceup":false},{"rank":4,"suit":3,"faceup":false},{"rank":3,"suit":1,"faceup":false},{"rank":2,"suit":1,"faceup":false},{"rank":1,"suit":1,"faceup":false},{"rank":1,"suit":2,"faceup":false}]}`))
@@ -244,14 +250,6 @@ QUnit.module("Game - parse()");
         game.parse(delta, () => {won = true;});
         assert.ok(won);
     });
-
-/*
-    QUnit.test("", function(assert) {
-        let game = sampleGame();
-        let delta = ;
-        game.parse(delta, () => {});
-        //assertions with deep equal 
-    }); */
 
 QUnit.module("Game - key_to_index()");
 

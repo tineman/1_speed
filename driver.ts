@@ -14,15 +14,6 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-//implement persistent ids later for reconnecting and disconnecting. FOr now, just get something basic implementsed
-    //also, using the socket ids directly is likely very insecure
-    //also, get a better idea of the number of players
-
-//or: on disconnect, the game pauses and the player can reconnect. When someone is in the middle of a game, disconnects
-//and reconnects, the game automatically shuffles. This is because my code is bad and doesn't send gamestates. Rather, it
-//sends two out of the fourteen decks, on the assumptmion that that was all that was needed. even though it's not much more efficent...
-//let's pretend it's because of "fairness"
-
 // using functions so we can have an interface. In the future, if a more efficient data structure is needed
 // the code can be revamped more easily
 
@@ -181,6 +172,9 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
         }
     });
 
+    /**
+     * Responds to client sending the server a move for validation
+     */
     socket.on("send_move", (gameID, sender, src, dst, callback) => {
         let game = findGame(gameID);
         if(game.getID === CONSTANTS.GAMENOTFOUND)
