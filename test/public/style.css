@@ -1,3 +1,4 @@
+/* Global */
 * {
   font-family: "VT323";
   color: #ffffff;
@@ -25,10 +26,20 @@ p {
   display: inline;
 }
 
-.cols
-{
-	display: flex;
-	flex-direction: column;
+.cols {
+  display: flex;
+  flex-direction: column;
+}
+
+.light-blue-back {
+  border: none;
+  font-size: 1.6rem;
+  padding: 10px;
+  background-color: #20343d;
+}
+
+.light-blue-back:active {
+  background-color: #1b2a31;
 }
 
 /* Modal Menu styling */
@@ -79,17 +90,6 @@ p {
   margin: 20% 0 20% 0;
 }
 
-.light-blue-back {
-  border: none;
-  font-size: 1.6rem;
-  padding: 10px;
-  background-color: #20343d;
-}
-
-.light-blue-back:active {
-  background-color: #1b2a31;
-}
-
 .options {
   margin: 10px;
 }
@@ -103,10 +103,9 @@ p {
   width: 100%;
 }
 
-#game-id
-{
-	display: none;
-	margin: 0;
+#game-id {
+  display: none;
+  margin: 0;
 }
 
 /* Game styling */
