@@ -114,7 +114,7 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
             //connect them to this room (redundant, they are already in their own room)
             
             addGame(socket.id);
-            callback({status: `Created game with ID ${socket.id}. Waiting for an opponent...`});
+            callback({status: true, msg: socket.id});
 
             // ------------------------------------------ \\
 
@@ -124,7 +124,7 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
 
             // ------------------------------------------ \\
 
-            callback({status: `Game with ID ${socket.id} already exists`});
+            callback({status: false, msg: "GAME ALREADY EXISTS"});
 
             // ------------------------------------------ \\
         }

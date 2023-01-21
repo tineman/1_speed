@@ -4,9 +4,11 @@ import Game from "./game.js";
 import "./keypress.js";
 //@ts-ignore
 var socket = io();
+const modaldiv = document.getElementById("modal");
 const gamediv = document.getElementById("game");
 const menudiv = document.getElementById("menu");
 const create_game = document.getElementById("create_game");
+const game_id = document.getElementById("game-id");
 const join_info = document.getElementById("join_info");
 const join = document.getElementById("join");
 // ---------- Listeners ------ \\
@@ -59,6 +61,29 @@ function playerInputControl(key) {
     }
 }
 /**
+ * Returns the user from a game to the main menu
+ */
+function backToMenu() {
+    modaldiv.style.display = "none";
+    gamediv.style.display = "none";
+    menudiv.style.display = "flex";
+    create_game.style.display = "inline-block";
+    game_id.style.display = "none";
+    join_info.innerHTML = "";
+}
+/**
+ * Opens a modal box with the message message
+ * @param message
+ */
+function modalMessage(message) {
+    modaldiv.style.display = "flex";
+    document.getElementById("modal-message").innerText = message;
+}
+//testing listner
+//@ts-ignore
+var test_listener = new window.keypress.Listener();
+//test_listener.simple_combo("shift", wrapper);
+/**
  * Adding listeners to keys
  */
 listener.register_combo({
@@ -97,7 +122,11 @@ create_game.addEventListener("click", (e) => {
     e.preventDefault();
     console.log("create_game");
     socket.emit("create_game", (response) => {
-        create_game.innerText = response.status;
+        if (response.status) {
+            game_id.style.display = "block";
+            create_game.style.display = "none";
+            game_id.innerText = `GameID: ${response.msg}`;
+        }
     });
 });
 /**
@@ -111,10 +140,24 @@ join.addEventListener("submit", (e) => {
     });
 });
 /**
+ * Returns the user from a game to the main menu
+ */
+document.getElementById("modal-return").addEventListener("click", (e) => {
+    e.preventDefault();
+    backToMenu();
+});
+/**
  * Reponds to the server broadcasting a move.
  */
 socket.on("receive_move", (delta) => {
-    game.parse(delta, () => { console.log("Someone won, we're just not sure who lmao"); });
+    game.parse(delta, () => {
+        if (delta.data.winner === role) {
+            modalMessage("You Win!");
+        }
+        else {
+            modalMessage("You Lost!");
+        }
+    });
     game.printState();
     let gameState = game.getState();
     for (let i = 0; i < 14; i++) {

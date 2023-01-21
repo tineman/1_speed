@@ -25,6 +25,12 @@ p {
   display: inline;
 }
 
+.cols
+{
+	display: flex;
+	flex-direction: column;
+}
+
 /* Modal Menu styling */
 
 #modal {
@@ -36,9 +42,7 @@ p {
   height: 100%;
   background-color: rgba(128, 128, 128, 0.2);
   backdrop-filter: blur(2px);
-  display: flex;
   align-items: center;
-
   display: none;
 }
 
@@ -97,6 +101,12 @@ p {
 
 #create_game {
   width: 100%;
+}
+
+#game-id
+{
+	display: none;
+	margin: 0;
 }
 
 /* Game styling */
