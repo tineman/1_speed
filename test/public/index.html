@@ -10,6 +10,15 @@
 
 </head>
 <body>
+
+    <div id="modal">
+        <div id="modal-content">
+            
+            <p id="modal-message">[PLACEHOLDER]</p>
+            <button id="modal-return" class="light-blue-back">Return to Main Menu</button>
+
+        </div>
+    </div>
     
     <div id="game">
         <div id="OTHER_HAND" class="hand">
@@ -42,21 +51,22 @@
 		</span>
 		
 		<p>A keyboard-based implementation of Speed</p>
-		
-		<div id="create" class="options">
-				<button id="create_game" class="light-blue-back" style="width:30%;"> Create Game </button>
-		</div>
-		
-		<form id="join" class="options">
-			<span>
-				<p> Join Game: </p>
-				<input id="join_info" class="light-blue-back" autocomplete="off" style="width:20%;" placeholder="Please input a GameID">
-			</span>
-		</form>
+
+		<div id="option-wrapper">
+            <div id="create" class="options">
+                    <button id="create_game" class="light-blue-back"> Create Game </button>
+            </div>
+            
+            <form id="join" class="options">
+                <span>
+                    <p> Join Game: </p>
+                    <input id="join_info" class="light-blue-back" autocomplete="off" placeholder="Please input a GameID">
+                </span>
+            </form>
+        </div>
 
 	</div>
 
-    <!--Lesson learned: keep script after body so it loads after... amazing.-->
     <script type="module" src="card.js"></script>
     <script type="module" src=game.js></script>
     <script type="module" src=animation.js></script>
