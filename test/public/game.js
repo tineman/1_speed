@@ -243,14 +243,13 @@ export default class Game {
                     this.returnCards(CONSTANTS.MID_RIGHT, CONSTANTS.MID_LEFT);
                     this.decks[CONSTANTS.OTHER_DECK] = delta.data.other;
                     this.decks[CONSTANTS.SELF_DECK] = delta.data.self;
-                    //this.dealHand();
+                    this.dealHand();
                 }
                 else {
                     delta.data.full = true;
                     this.returnCards(delta.data.other, delta.data.self);
                     delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
                     delta.data.self = this.decks[CONSTANTS.SELF_DECK];
-                    //this.dealHand();
                 }
                 break;
             case "START":
@@ -267,6 +266,7 @@ export default class Game {
                                 self: this.decks[CONSTANTS.SELF_DECK],
                                 other: this.decks[CONSTANTS.OTHER_DECK]
                             } };
+                        this.dealHand();
                     }
                     if (this.decks[CONSTANTS.OTHER_DECK].cards.length != 0) {
                         transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);

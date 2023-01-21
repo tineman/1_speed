@@ -108,7 +108,6 @@ io.on("connection", (socket) => {
             let delta = game.move(CONSTANTS.SELF, 6, 6);
             game.parse(delta, () => { }); //parse and then emit
             let roles = JSON.parse(`{"${game.getSelf}":"${CONSTANTS.SELF}", "${game.getOther}":"${CONSTANTS.OTHER}"}`);
-            console.log(delta); //11 cards
             io.to(gameid).emit("start_game", delta, gameid, roles);
             game.setPause = false;
             game.dealHand();

@@ -93,6 +93,7 @@ listener.register_combo({
         hold = true;
     },
     "on_keyup": (event, combo, autorepeat) => {
+        srcindex = -1;
         console.log("space_up");
         hold = false;
     },
@@ -176,7 +177,6 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     role = assignedRole[socket.id];
     game = new Game(gameid);
     game.parse(delta, () => { });
-    game.dealHand();
     game.parse({ valid: true, operation: "START", data: { self: true, other: true } }, () => { });
     game.printState();
     let gameState = game.getState();

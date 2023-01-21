@@ -234,7 +234,6 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
 
     game = new Game(gameid);
     game.parse(delta, () => {});
-    game.dealHand();
     game.parse({valid: true, operation: "START", data: {self: true, other: true}}, () => {});
     game.printState();
     

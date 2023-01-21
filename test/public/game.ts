@@ -337,7 +337,7 @@ export default class Game
                     this.decks[CONSTANTS.OTHER_DECK] = delta.data.other;
                     this.decks[CONSTANTS.SELF_DECK] = delta.data.self;
 
-                    //this.dealHand();
+                    this.dealHand();
                 }
                 else
                 {
@@ -348,7 +348,6 @@ export default class Game
                     delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
                     delta.data.self = this.decks[CONSTANTS.SELF_DECK];
 
-                    //this.dealHand();
                 }
                 break;
 
@@ -371,6 +370,8 @@ export default class Game
                                 self: this.decks[CONSTANTS.SELF_DECK],
                                 other: this.decks[CONSTANTS.OTHER_DECK]
                             }};
+
+                        this.dealHand();
                     }
 
                     if(this.decks[CONSTANTS.OTHER_DECK].cards.length != 0)
