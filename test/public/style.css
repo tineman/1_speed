@@ -1,95 +1,133 @@
-* 
-{
-	font-family: "VT323";
-	color: #ffffff;
-	overflow: hidden;
-  	box-sizing: border-box;
+/* Global */
+* {
+  font-family: "VT323";
+  color: #ffffff;
+  overflow: hidden;
 }
 
-h1
-{
-	font-size: 6.4rem;
-	display: inline;
-	
+html {
+  width: 100%;
+  height: 100%;
 }
-p
-{
-	font-size: 1.6rem;
-	display: inline;
+
+body {
+  width: 100%;
+  height: 100%;
+  background-color: #101525;
 }
+
+h1 {
+  font-size: 6.4rem;
+  display: inline;
+}
+
+p {
+  font-size: 1.6rem;
+  display: inline;
+}
+
+.cols {
+  display: flex;
+  flex-direction: column;
+}
+
+.light-blue-back {
+  border: none;
+  font-size: 1.6rem;
+  padding: 10px;
+  background-color: #20343d;
+}
+
+.light-blue-back:active {
+  background-color: #1b2a31;
+}
+
+/* Modal Menu styling */
+
+#modal {
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(128, 128, 128, 0.2);
+  backdrop-filter: blur(2px);
+  align-items: center;
+  display: none;
+}
+
+#modal-content {
+  background-color: #101525;
+  padding: 40px;
+  text-align: center;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+}
+
+/* Main Menu */
 
 @keyframes blink {
-  50% {opacity:0}
+  50% {
+    opacity: 0;
+  }
 }
 
-#cursor
-{
-	animation-name:blink;
-	animation-duration:1.5s;
-	animation-iteration-count:infinite;
-	animation-timing-function:steps(1, jump-end);
+#cursor {
+  animation-name: blink;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: steps(1, jump-end);
 }
 
-#menu
-{
-	text-align: center;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	height: 60%
+#menu {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 20% 0 20% 0;
 }
 
-.options
-{
-	margin-top: 8px;
+.options {
+  margin: 10px;
 }
 
-.light-blue-back
-{
-	background-color: #20343d;
-	border:none;
-	font-size: 1.6rem;
+#option-wrapper {
+  width: fit-content;
+  margin: auto;
 }
 
-.light-blue-back:active
-{
-	background-color: #1B2A31;
+#create_game {
+  width: 100%;
 }
 
-html
-{
-	width: 95%;
-	height: 95%;
+#game-id {
+  display: none;
+  margin: 0;
 }
 
-body
-{
-	width: 100%;
-	height: 100%;
-  	background-color: #101525;
-}
+/* Game styling */
 
 .deck {
-	display: inline-block;
-	margin: 5px 10px;
+  display: inline-block;
+  margin: 5px 10px;
 }
 
-#game
-{
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	display: none; /* none or flex */
-	flex-direction: column;
-	justify-content: space-between;
+#game {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: none; /* none or flex */
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-#OTHER_DECK
-{
-	float: left;
+#OTHER_DECK {
+  float: left;
 }
 
-#SELF_DECK
-{
-	float: right;
+#SELF_DECK {
+  float: right;
 }

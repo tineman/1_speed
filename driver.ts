@@ -14,15 +14,6 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-//implement persistent ids later for reconnecting and disconnecting. FOr now, just get something basic implementsed
-    //also, using the socket ids directly is likely very insecure
-    //also, get a better idea of the number of players
-
-//or: on disconnect, the game pauses and the player can reconnect. When someone is in the middle of a game, disconnects
-//and reconnects, the game automatically shuffles. This is because my code is bad and doesn't send gamestates. Rather, it
-//sends two out of the fourteen decks, on the assumptmion that that was all that was needed. even though it's not much more efficent...
-//let's pretend it's because of "fairness"
-
 // using functions so we can have an interface. In the future, if a more efficient data structure is needed
 // the code can be revamped more easily
 
@@ -123,7 +114,7 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
             //connect them to this room (redundant, they are already in their own room)
             
             addGame(socket.id);
-            callback({status: `Created game with ID ${socket.id}. Waiting for an opponent...`});
+            callback({status: true, msg: socket.id});
 
             // ------------------------------------------ \\
 
@@ -133,7 +124,7 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
 
             // ------------------------------------------ \\
 
-            callback({status: `Game with ID ${socket.id} already exists`});
+            callback({status: false, msg: "GAME ALREADY EXISTS"});
 
             // ------------------------------------------ \\
         }
@@ -164,7 +155,6 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
             let delta = game.move(CONSTANTS.SELF, 6, 6);
             game.parse(delta, () => {}); //parse and then emit
             let roles = JSON.parse(`{"${game.getSelf}":"${CONSTANTS.SELF}", "${game.getOther}":"${CONSTANTS.OTHER}"}`)
-            console.log(delta); //11 cards
             io.to(gameid).emit("start_game", delta, gameid, roles);
             game.setPause = false;
             game.dealHand();
@@ -181,6 +171,9 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
         }
     });
 
+    /**
+     * Responds to client sending the server a move for validation
+     */
     socket.on("send_move", (gameID, sender, src, dst, callback) => {
         let game = findGame(gameID);
         if(game.getID === CONSTANTS.GAMENOTFOUND)
@@ -191,7 +184,11 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
         let delta = game.move(sender, src, dst);
         if(delta.valid)
         {
-            game.parse(delta, () => {console.log(`Winner in game ${gameID}`)});
+            game.parse(delta, () => {
+                console.log(`Winner in game ${gameID}`);
+                io.socketsLeave(gameID);
+                deleteGame(gameID);
+            });
             io.to(gameID).emit("receive_move", delta);
             callback(true);
         }
