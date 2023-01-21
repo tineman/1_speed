@@ -1,76 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323">
-    <link href="style.css" rel="stylesheet" type="text/css"/>
-
-</head>
-<body>
-
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=VT323"
+    />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
     <div id="modal">
-        <div id="modal-content">
-            
-            <p id="modal-message">[PLACEHOLDER]</p>
-            <button id="modal-return" class="light-blue-back">Return to Main Menu</button>
-
-        </div>
+      <div id="modal-content">
+        <p id="modal-message">[PLACEHOLDER]</p>
+        <button id="modal-return" class="light-blue-back">
+          Return to Main Menu
+        </button>
+      </div>
     </div>
-    
-    <div id="game">
-        <div id="OTHER_HAND" class="hand">
-            <div id = OTHER_D class = "deck"> <canvas width="144" height="176" id="0" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = OTHER_F class = "deck"> <canvas width="144" height="176" id="1" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = OTHER_G class = "deck"> <canvas width="144" height="176" id="2" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = OTHER_J class = "deck"> <canvas width="144" height="176" id="3" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = OTHER_K class = "deck"> <canvas width="144" height="176" id="4" class="card"> [ALT TEXT] </canvas> </div>
-        </div>
-        <div id="MID_HAND" class="hand">
-            <div id = OTHER_DECK class = "deck"> <canvas width="144" height="176" id="5" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = MID_LEFT class = "deck"> <canvas width="144" height="176" id="6" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = MID_RIGHT class = "deck"> <canvas width="144" height="176" id="7" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = SELF_DECK class = "deck"> <canvas width="144" height="176" id="13" class="card"> [ALT TEXT] </canvas> </div>
-        </div>
-        <div id="SELF_HAND" class="hand">
-            <div id = SELF_D class = "deck"> <canvas width="144" height="176" id="8" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = SELF_F class = "deck"> <canvas width="144" height="176" id="9" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = SELF_G class = "deck"> <canvas width="144" height="176" id="10" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = SELF_J class = "deck"> <canvas width="144" height="176" id="11" class="card"> [ALT TEXT] </canvas> </div>
-            <div id = SELF_K class = "deck"> <canvas width="144" height="176" id="12" class="card"> [ALT TEXT] </canvas> </div>
-        </div>
 
+    <div id="game">
+      <div id="OTHER_HAND" class="hand">
+        <div id="OTHER_D" class="deck">
+          <canvas width="144" height="176" id="0" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="OTHER_F" class="deck">
+          <canvas width="144" height="176" id="1" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="OTHER_G" class="deck">
+          <canvas width="144" height="176" id="2" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="OTHER_J" class="deck">
+          <canvas width="144" height="176" id="3" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="OTHER_K" class="deck">
+          <canvas width="144" height="176" id="4" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+      </div>
+      <div id="MID_HAND" class="hand">
+        <div id="OTHER_DECK" class="deck">
+          <canvas width="144" height="176" id="5" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="MID_LEFT" class="deck">
+          <canvas width="144" height="176" id="6" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="MID_RIGHT" class="deck">
+          <canvas width="144" height="176" id="7" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="SELF_DECK" class="deck">
+          <canvas width="144" height="176" id="13" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+      </div>
+      <div id="SELF_HAND" class="hand">
+        <div id="SELF_D" class="deck">
+          <canvas width="144" height="176" id="8" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="SELF_F" class="deck">
+          <canvas width="144" height="176" id="9" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="SELF_G" class="deck">
+          <canvas width="144" height="176" id="10" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="SELF_J" class="deck">
+          <canvas width="144" height="176" id="11" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+        <div id="SELF_K" class="deck">
+          <canvas width="144" height="176" id="12" class="card">
+            [ALT TEXT]
+          </canvas>
+        </div>
+      </div>
     </div>
 
     <div id="menu">
+      <span id="title">
+        <h1>|ABSOLUTE VELOCITY</h1>
+        <h1 id="cursor">|</h1>
+      </span>
 
-		<span id="title">
-			<h1 >|ABSOLUTE VELOCITY</h1><h1 id="cursor">|</h1>
-		</span>
-		
-		<p>A keyboard-based implementation of Speed</p>
+      <p>A keyboard-based implementation of Speed</p>
 
-		<div id="option-wrapper">
-            <div id="create" class="options">
-                    <button id="create_game" class="light-blue-back"> Create Game </button>
-            </div>
-            
-            <form id="join" class="options">
-                <span>
-                    <p> Join Game: </p>
-                    <input id="join_info" class="light-blue-back" autocomplete="off" placeholder="Please input a GameID">
-                </span>
-            </form>
+      <div id="option-wrapper">
+        <div id="create" class="options">
+          <button id="create_game" class="light-blue-back">Create Game</button>
         </div>
 
-	</div>
+        <form id="join" class="options">
+          <span>
+            <p>Join Game:</p>
+            <input
+              id="join_info"
+              class="light-blue-back"
+              autocomplete="off"
+              placeholder="Please input a GameID"
+            />
+          </span>
+        </form>
+      </div>
+    </div>
 
     <script type="module" src="card.js"></script>
-    <script type="module" src=game.js></script>
-    <script type="module" src=animation.js></script>
+    <script type="module" src="game.js"></script>
+    <script type="module" src="animation.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="index.js"></script>
     <script type="module" src="keypress.js"></script>
-</body>
+  </body>
+</html>
