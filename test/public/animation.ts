@@ -74,6 +74,26 @@ export function updateHTML(cards:Card[], role:string)
 }
 
 /**
+ * Emphasise a deck with index index
+ * @param index 
+ * @param role 
+ */
+export function updateSelect(index:number, role:string)
+{
+    gameElements.forEach((element) =>
+    {
+        //@ts-ignore
+        element.canvas.parentNode.style.margin = "0 10px 0 10px";
+    });
+
+    if(index !== -1)
+    {
+        //@ts-ignore
+        gameElements[roleAdapter(index, role)].canvas.parentNode.style.margin = "0 10px 50px 10px";
+    }
+}
+
+/**
  * Parses delta and create the corresponding animation
  * @param delta 
  */

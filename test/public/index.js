@@ -1,4 +1,4 @@
-import { updateHTML } from "./animation.js";
+import { updateHTML, updateSelect } from "./animation.js";
 import { CONSTANTS } from "./constants.js";
 import Game from "./game.js";
 import "./keypress.js";
@@ -46,15 +46,18 @@ function playerInputControl(key) {
     if (hold) {
         if (srcindex === -1) {
             srcindex = newindex;
+            updateSelect(srcindex, role);
             return;
         }
         //Prevents the controller retaining a middle deck as a source
         if ((srcindex === CONSTANTS.MID_LEFT || srcindex === CONSTANTS.MID_RIGHT) && (newindex < CONSTANTS.MID_LEFT || newindex > CONSTANTS.MID_RIGHT)) {
             srcindex = newindex;
+            updateSelect(srcindex, role);
             return;
         }
         sendMoveToServer(srcindex, newindex);
         srcindex = -1;
+        updateSelect(srcindex, role);
     }
     else {
         sendMoveToServer(newindex, newindex);
@@ -75,6 +78,7 @@ listener.register_combo({
     },
     "on_keyup": (event, combo, autorepeat) => {
         srcindex = -1;
+        updateSelect(srcindex, role);
         console.log("space_up");
         hold = false;
     },

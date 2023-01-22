@@ -64,11 +64,8 @@ p {
 {
 	position: absolute;
     left: 0;
-    top: 0;
-    bottom: 0;
+    bottom: 40%;
     right: 0;
-    height: fit-content;
-    margin: auto 0;
 }
 
 /* Modal Menu styling */
@@ -141,7 +138,21 @@ p {
 
 .deck {
   display: inline-block;
-  margin: 5px 10px;
+  margin: 0px 10px;
+}
+
+#SELF_DECK
+{
+	position: absolute;
+	bottom: 0;
+	right: 20px;
+}
+
+#OTHER_DECK
+{
+	position: absolute;
+	bottom: 0;
+	left: 20px;
 }
 
 #game {
@@ -153,10 +164,3 @@ p {
   position: relative;
 }
 
-#OTHER_DECK {
-  float: left;
-}
-
-#SELF_DECK {
-  float: right;
-}
