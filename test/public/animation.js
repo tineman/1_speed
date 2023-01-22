@@ -22,7 +22,7 @@ img.src = "assets.png";
  */
 function roleAdapter(index, role) {
     if (role === CONSTANTS.OTHER) {
-        if (CONSTANTS.OTHER_D <= index && index <= CONSTANTS.SELF_D)
+        if (CONSTANTS.OTHER_D <= index && index <= CONSTANTS.OTHER_K)
             return index + 8; //maps OTHER D-K to SELF D-K
         else if (CONSTANTS.SELF_D <= index && index <= CONSTANTS.SELF_K)
             return index - 8; //Vice versa
