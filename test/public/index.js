@@ -172,7 +172,7 @@ socket.on("receive_move", (delta) => {
 socket.on("start_game", (delta, gameid, assignedRole) => {
     //start_game   ------------------------------ \\
     //Client: Hide menu and show gamediv, receive gamestate, start game internally
-    gamediv.style.display = "flex";
+    gamediv.style.display = "block";
     menudiv.style.display = "none";
     role = assignedRole[socket.id];
     game = new Game(gameid);
