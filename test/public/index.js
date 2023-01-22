@@ -60,25 +60,6 @@ function playerInputControl(key) {
         sendMoveToServer(newindex, newindex);
     }
 }
-/**
- * Returns the user from a game to the main menu
- */
-function backToMenu() {
-    modaldiv.style.display = "none";
-    gamediv.style.display = "none";
-    menudiv.style.display = "flex";
-    create_game.style.display = "inline-block";
-    game_id.style.display = "none";
-    join_info.innerHTML = "";
-}
-/**
- * Opens a modal box with the message message
- * @param message
- */
-function modalMessage(message) {
-    modaldiv.style.display = "flex";
-    document.getElementById("modal-message").innerText = message;
-}
 //testing listner
 //@ts-ignore
 var test_listener = new window.keypress.Listener();
@@ -115,6 +96,33 @@ for (let key of valid_keys) {
     });
 }
 listener.stop_listening();
+// --------------------------- \\
+/**
+ * Returns the user from a game to the main menu
+ */
+function backToMenu() {
+    modaldiv.style.display = "none";
+    gamediv.style.display = "none";
+    menudiv.style.display = "flex";
+    create_game.style.display = "inline-block";
+    game_id.style.display = "none";
+    join_info.innerHTML = "";
+}
+/**
+ * Opens a modal box with the message message
+ * @param message
+ */
+function modalMessage(message) {
+    modaldiv.style.display = "flex";
+    document.getElementById("modal-message").innerText = message;
+}
+// --------------------------- \\
+/**
+ * Wrapper function to update HTML
+ */
+function update() {
+    updateHTML(game.getState(), role);
+}
 // --------------------------- \\
 /**
  * Runs when Create Game is clicked. Requests the server to create a game and prints output on the button
@@ -160,10 +168,7 @@ socket.on("receive_move", (delta) => {
         }
     });
     game.printState();
-    let gameState = game.getState();
-    for (let i = 0; i < 14; i++) {
-        updateHTML(i, gameState[i]);
-    }
+    update();
 });
 // ------------------------------------------ \\
 /**
@@ -179,10 +184,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     game.parse(delta, () => { });
     game.parse({ valid: true, operation: "START", data: { self: true, other: true } }, () => { });
     game.printState();
-    let gameState = game.getState();
-    for (let i = 0; i < 14; i++) {
-        updateHTML(i, gameState[i]);
-    }
+    update();
     //
     listener.listen();
     // ------------------------------------------ \\
