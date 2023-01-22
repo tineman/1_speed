@@ -32,7 +32,7 @@ function roleAdapter(index:number, role:string)
 {
     if(role === CONSTANTS.OTHER)
     {
-        if(CONSTANTS.OTHER_D <= index && index <= CONSTANTS.SELF_D) return index + 8; //maps OTHER D-K to SELF D-K
+        if(CONSTANTS.OTHER_D <= index && index <= CONSTANTS.OTHER_K) return index + 8; //maps OTHER D-K to SELF D-K
         else if(CONSTANTS.SELF_D <= index && index <= CONSTANTS.SELF_K) return index - 8; //Vice versa
         else if(index === CONSTANTS.OTHER_DECK) return CONSTANTS.SELF_DECK; //maps OTHER deck to SELF deck
         else if(index === CONSTANTS.SELF_DECK) return CONSTANTS.OTHER_DECK; //vice versa
