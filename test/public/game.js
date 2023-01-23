@@ -266,7 +266,7 @@ export default class Game {
                                 self: this.decks[CONSTANTS.SELF_DECK],
                                 other: this.decks[CONSTANTS.OTHER_DECK]
                             } };
-                        this.dealHand();
+                        //this.dealHand();
                     }
                     if (this.decks[CONSTANTS.OTHER_DECK].cards.length != 0) {
                         transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);

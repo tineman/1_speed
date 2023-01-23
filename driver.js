@@ -1,13 +1,17 @@
 import Game from "./test/public/game.js";
 import { CONSTANTS } from "./test/public/constants.js";
+//@ts-ignore
 import express from "express";
 import { createServer } from "http";
+//@ts-ignore
 import { Server } from "socket.io";
 const app = express();
+//@ts-ignore
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+//@ts-ignore
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // using functions so we can have an interface. In the future, if a more efficient data structure is needed
 // the code can be revamped more easily
@@ -135,6 +139,8 @@ io.on("connection", (socket) => {
                 io.socketsLeave(gameID);
                 deleteGame(gameID);
             });
+            if ((delta === null || delta === void 0 ? void 0 : delta.operation) === "SHUFFLE")
+                game.dealHand();
             io.to(gameID).emit("receive_move", delta);
             callback(true);
         }

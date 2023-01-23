@@ -371,7 +371,7 @@ export default class Game
                                 other: this.decks[CONSTANTS.OTHER_DECK]
                             }};
 
-                        this.dealHand();
+                        //this.dealHand();
                     }
 
                     if(this.decks[CONSTANTS.OTHER_DECK].cards.length != 0)
