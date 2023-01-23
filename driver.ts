@@ -194,10 +194,10 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
                 deleteGame(gameID);
             });
 
-            if(delta?.operation === "SHUFFLE") game.dealHand();
-
             io.to(gameID).emit("receive_move", delta);
             callback(true);
+
+            if(delta?.operation === "SHUFFLE") game.dealHand();
         }
         else
         {

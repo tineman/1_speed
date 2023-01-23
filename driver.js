@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
             game.dealHand();
             game.parse({ valid: true, operation: "START", data: { self: true, other: true } }, () => { });
             // ------------------------------------------ \\
-            games.forEach((game) => { game.printAll; });
+            games.forEach((game) => { game.printAll(); });
             callback({ status: `Joined game!` });
         }
         else {
@@ -139,10 +139,10 @@ io.on("connection", (socket) => {
                 io.socketsLeave(gameID);
                 deleteGame(gameID);
             });
-            if ((delta === null || delta === void 0 ? void 0 : delta.operation) === "SHUFFLE")
-                game.dealHand();
             io.to(gameID).emit("receive_move", delta);
             callback(true);
+            if ((delta === null || delta === void 0 ? void 0 : delta.operation) === "SHUFFLE")
+                game.dealHand();
         }
         else {
             callback(false);
