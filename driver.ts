@@ -166,7 +166,7 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
 
             // ------------------------------------------ \\
 
-            game.printAll();
+            games.forEach((game) => {game.printAll()});
             callback({status: `Joined game!`});
         }
         else

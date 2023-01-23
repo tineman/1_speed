@@ -62,11 +62,11 @@ export function updateHTML(cards:Card[], role:string)
             case CONSTANTS.EMPTY:
                 //@ts-ignore
                 gameElements[roleAdapter(i, role)].context.drawImage(img, 160, 96, 18, 22, 0, 0, CONSTANTS.CARD_WIDTH, CONSTANTS.CARD_HEIGHT);
-                return;
+                break;
 
             case CONSTANTS.STACK:
                 
-                return;
+                break;
         }
     }
     

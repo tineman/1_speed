@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
             game.dealHand();
             game.parse({ valid: true, operation: "START", data: { self: true, other: true } }, () => { });
             // ------------------------------------------ \\
-            game.printAll();
+            games.forEach((game) => { game.printAll; });
             callback({ status: `Joined game!` });
         }
         else {

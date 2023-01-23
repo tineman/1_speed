@@ -54,9 +54,9 @@ export function updateHTML(cards, role) {
             case CONSTANTS.EMPTY:
                 //@ts-ignore
                 gameElements[roleAdapter(i, role)].context.drawImage(img, 160, 96, 18, 22, 0, 0, CONSTANTS.CARD_WIDTH, CONSTANTS.CARD_HEIGHT);
-                return;
+                break;
             case CONSTANTS.STACK:
-                return;
+                break;
         }
     }
     //Special cards (for OK card, stack card [rank indicates stack size]) //add constants
