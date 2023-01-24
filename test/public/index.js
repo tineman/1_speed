@@ -94,9 +94,12 @@ listener.register_combo({
 });
 let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"];
 for (let key of valid_keys) {
-    listener.simple_combo(key.toLowerCase(), () => {
-        console.log(`${key} registered!`);
-        playerInputControl(key);
+    listener.register_combo({
+        "keys": key.toLowerCase(),
+        "on_keydown": (event, combo, autorepeat) => {
+            playerInputControl(key);
+        },
+        "prevent_repeat": true
     });
 }
 listener.stop_listening();
