@@ -98,7 +98,7 @@ export function updateSelect(indices:Array<number>, role:string)
 
 export function updateFlash(delta, role:string)
 {
-    if(delta?.valid && delta.operation === "MOVE" && roleAdapter(delta.data.src, role) < 5 )
+    if(delta?.valid && delta.operation === "MOVE" && roleAdapter(delta.data.dst, role) < 8 )
     {
 
         gameElements[roleAdapter(delta.data.src, role)].canvas.parentNode.classList.add("src-flash");
@@ -108,7 +108,7 @@ export function updateFlash(delta, role:string)
         {
             gameElements[roleAdapter(delta.data.src, role)].canvas.parentNode.classList.remove("src-flash");
             gameElements[roleAdapter(delta.data.dst, role)].canvas.parentNode.classList.remove("dst-flash");
-        }, 500)
+        }, 400)
 
     }
 }

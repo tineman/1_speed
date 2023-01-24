@@ -79,12 +79,13 @@ export function updateSelect(indices, role) {
     });
 }
 export function updateFlash(delta, role) {
-    if ((delta === null || delta === void 0 ? void 0 : delta.valid) && delta.operation === "MOVE" && roleAdapter(delta.data.src, role) < 5) {
+    if ((delta === null || delta === void 0 ? void 0 : delta.valid) && delta.operation === "MOVE" && roleAdapter(delta.data.dst, role) < 8) {
         gameElements[roleAdapter(delta.data.src, role)].canvas.parentNode.classList.add("src-flash");
         gameElements[roleAdapter(delta.data.dst, role)].canvas.parentNode.classList.add("dst-flash");
         setTimeout(() => {
             gameElements[roleAdapter(delta.data.src, role)].canvas.parentNode.classList.remove("src-flash");
             gameElements[roleAdapter(delta.data.dst, role)].canvas.parentNode.classList.remove("dst-flash");
-        }, 500);
+        }, 400);
     }
 }
+//welna is the best

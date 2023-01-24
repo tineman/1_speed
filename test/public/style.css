@@ -171,7 +171,7 @@ p {
 
 .select
 {
-	margin: 0px 10px 50px 10px;
+	background-color: rgba(128, 128, 128, 20);
 }
 
 /* Flashes for opponent moves */
@@ -183,10 +183,11 @@ p {
 
 .src-flash
 {
-	animation: 0.3s steps(1, jump-end) 0s flash;
+	animation: 0.1s steps(1, jump-end) 0s flash;
 }
 
 .dst-flash
 {
-	animation: 0.3s steps(1, jump-end) 0.1s flash;
+	animation: 0.15s steps(1, jump-end) 0.1s flash;
 }
+
