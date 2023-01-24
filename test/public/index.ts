@@ -1,4 +1,4 @@
-import { updateHTML, updateSelect } from "./animation.js";
+import { updateFlash, updateHTML, updateSelect } from "./animation.js";
 import { CONSTANTS } from "./constants.js";
 import Game from "./game.js";
 import "./keypress.js"
@@ -64,7 +64,7 @@ function playerInputControl(key:string)
         if(srcindex === -1)
         {
             srcindex = newindex;
-            updateSelect(srcindex, role);
+            update(null, srcindex);
             return;
         }
 
@@ -72,13 +72,13 @@ function playerInputControl(key:string)
         if((srcindex === CONSTANTS.MID_LEFT || srcindex === CONSTANTS.MID_RIGHT) && (newindex < CONSTANTS.MID_LEFT || newindex > CONSTANTS.MID_RIGHT))
         {
             srcindex = newindex;
-            updateSelect(srcindex, role);
+            update(null, srcindex);
             return;
         }
         
         sendMoveToServer(srcindex, newindex);
         srcindex = -1;
-        updateSelect(srcindex, role);
+        update(null, srcindex);
         
     }
     else
@@ -102,13 +102,11 @@ var test_listener = new window.keypress.Listener();
 listener.register_combo({
     "keys": "space",
     "on_keydown": (event, combo, autorepeat) => {
-        console.log("space_down");
         hold = true;
     },
     "on_keyup": (event, combo, autorepeat) => {
         srcindex = -1;
-        updateSelect(srcindex, role);
-        console.log("space_up");
+        update(null, srcindex);
         hold = false;
     },
     "prevent_repeat": true
@@ -172,9 +170,26 @@ function modalMessage(message:string)
 /**
  * Wrapper function to update HTML
  */
-function update()
+function update(delta = null, index = -1)
 {
+
+    //Update the margin.
+    let indicies = [index]
+    if(game.getOtherWant) indicies.push(5)
+    else indicies.push(-1);
+
+    if(game.getSelfWant) indicies.push(13);
+    else indicies.push(-1);
+    
+    updateSelect(indicies, role)
+
+    //update html
+
     updateHTML(game.getState(), role);
+
+    //update flashes (if needed)
+
+    updateFlash(delta, role);
 }
 
 // --------------------------- \\
@@ -232,7 +247,7 @@ socket.on("receive_move", (delta) => {
     });
     game.printState();
     
-    update();
+    update(delta);
     
 })
 

@@ -78,26 +78,37 @@ export function updateHTML(cards:Card[], role:string)
  * @param index 
  * @param role 
  */
-export function updateSelect(index:number, role:string)
+export function updateSelect(indices:Array<number>, role:string)
 {
     gameElements.forEach((element) =>
     {
+        //add to the classlist
         //@ts-ignore
-        element.canvas.parentNode.style.margin = "0 10px 0 10px";
+        element.canvas.parentNode.classList.remove("select");
     });
 
-    if(index !== -1)
+    indices.forEach((index) =>
     {
-        //@ts-ignore
-        gameElements[roleAdapter(index, role)].canvas.parentNode.style.margin = "0 10px 50px 10px";
-    }
+        if(index !== -1)
+            //@ts-ignore
+            gameElements[roleAdapter(index, role)].canvas.parentNode.classList.add("select");
+    });
+
 }
 
-/**
- * Parses delta and create the corresponding animation
- * @param delta 
- */
-function parseAnimationDelta(delta)
+export function updateFlash(delta, role:string)
 {
+    if(delta?.valid && delta.operation === "MOVE" && roleAdapter(delta.data.src, role) < 5 )
+    {
 
+        gameElements[roleAdapter(delta.data.src, role)].canvas.parentNode.classList.add("src-flash");
+        gameElements[roleAdapter(delta.data.dst, role)].canvas.parentNode.classList.add("dst-flash");
+
+        setTimeout(() =>
+        {
+            gameElements[roleAdapter(delta.data.src, role)].canvas.parentNode.classList.remove("src-flash");
+            gameElements[roleAdapter(delta.data.dst, role)].canvas.parentNode.classList.remove("dst-flash");
+        }, 500)
+
+    }
 }

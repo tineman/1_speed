@@ -66,6 +66,7 @@ p {
     left: 0;
     bottom: 40%;
     right: 0;
+	padding: 20px;
 }
 
 /* Modal Menu styling */
@@ -139,6 +140,8 @@ p {
 .deck {
   display: inline-block;
   margin: 0px 10px;
+  padding: 10px;
+  border-radius: 12px;
 }
 
 #SELF_DECK
@@ -164,3 +167,26 @@ p {
   position: relative;
 }
 
+/* Animation controls */
+
+.select
+{
+	margin: 0px 10px 50px 10px;
+}
+
+/* Flashes for opponent moves */
+
+@keyframes flash
+{
+	0% {background-color: rgba(128, 128, 128, 20);}
+}
+
+.src-flash
+{
+	animation: 0.3s steps(1, jump-end) 0s flash;
+}
+
+.dst-flash
+{
+	animation: 0.3s steps(1, jump-end) 0.1s flash;
+}

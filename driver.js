@@ -136,10 +136,10 @@ io.on("connection", (socket) => {
         if (delta.valid) {
             game.parse(delta, () => {
                 console.log(`Winner in game ${gameID}`);
+                io.socketsLeave(gameID);
+                deleteGame(gameID);
             });
             io.to(gameID).emit("receive_move", delta);
-            io.socketsLeave(gameID);
-            deleteGame(gameID);
             callback(true);
             if ((delta === null || delta === void 0 ? void 0 : delta.operation) === "SHUFFLE")
                 game.dealHand();
