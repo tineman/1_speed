@@ -84,24 +84,24 @@ function transfer(src, dst) {
 //Checks if the move is valid. Checks OTHER for AI purposes. This checks validity for the client and the server.
 function isValid(src, dst) {
     //Moves a card in their own hand.
-    if ((src.location == "SELF" && dst.location == "SELF") || (src.location == "OTHER" && dst.location == "OTHER")) {
+    if ((src.location === "SELF" && dst.location === "SELF") || (src.location === "OTHER" && dst.location === "OTHER")) {
         //Cannot happen if the decks are the same, or if either of the decks are facedown
-        if (src == dst)
+        if (src === dst)
             return true; //flip
-        if (dst.cards.length == 0)
+        if (dst.cards.length === 0)
             return true; //moving onto an empty space
         if (!src.cards[0].faceup || !dst.cards[0].faceup)
             return false;
-        return src.cards[0].rank == dst.cards[0].rank;
+        return src.cards[0].rank === dst.cards[0].rank;
     }
     //Moves a card from a player's hand to an opponent's
-    else if ((src.location == "SELF" || src.location == "OTHER") && dst.location == "MID") {
-        if (src.cards.length == 0 || dst.cards.length == 0 || !src.cards[0].faceup || !dst.cards[0].faceup)
+    else if ((src.location === "SELF" || src.location === "OTHER") && dst.location === "MID") {
+        if (src.cards.length === 0 || dst.cards.length === 0 || !src.cards[0].faceup || !dst.cards[0].faceup)
             return false;
         return isAdjacent(src.cards[0], dst.cards[0]);
     }
     //"Slaps" the middle to win. The Game checks the win condition seperately
-    else if (src.location == "MID" && dst.location == "MID")
+    else if (src.location === "MID" && src === dst)
         return true;
     return false;
 }
