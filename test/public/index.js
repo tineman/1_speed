@@ -39,19 +39,34 @@ function sendMoveToServer(src, dst) {
 }
 /**
  * Deceides if the input is a player flipping cards or if it is a player moving cards
+ * Also contains quality of life improvements
  * @param key The key the player pressed
  */
 function playerInputControl(key) {
     let newindex = Game.key_to_index(key, role);
     if (hold) {
+        //prevents the user from making a move with no source
         if (srcindex === -1) {
             srcindex = newindex;
             update(null, srcindex);
             return;
         }
-        //Prevents the controller retaining a middle deck as a source
+        //Prevents the controller from using a middle deck as a source
         if ((srcindex === CONSTANTS.MID_LEFT || srcindex === CONSTANTS.MID_RIGHT) && (newindex < CONSTANTS.MID_LEFT || newindex > CONSTANTS.MID_RIGHT)) {
             srcindex = newindex;
+            update(null, srcindex);
+            return;
+        }
+        let delta = game.move(role, srcindex, newindex);
+        //If the player is going to make an invalid move, change the source instead
+        if (!(delta.valid)) {
+            srcindex = newindex;
+            update(null, srcindex);
+            return;
+        }
+        //prevents the player from flipping a card when holding space
+        if (delta.operation === "FLIP") {
+            srcindex = -1;
             update(null, srcindex);
             return;
         }
