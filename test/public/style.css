@@ -11,7 +11,7 @@ html {
 }
 
 body {
-margin: 0;
+  margin: 0;
   width: 100%;
   height: 100%;
   background-color: #101525;
@@ -43,29 +43,25 @@ p {
   background-color: #1b2a31;
 }
 
-.absolute-hor-center
-{
-	position: absolute;
-	left: 0;
-	right: 0;
+.absolute-hor-center {
+  position: absolute;
+  left: 0;
+  right: 0;
 }
 
-.top
-{
-	top: 5%;
+.top {
+  top: 5%;
 }
 
-.bottom
-{
-	bottom: 5%;
+.bottom {
+  bottom: 5%;
 }
 
-.absolute-all-center
-{
-	position: absolute;
-    left: 0;
-    bottom: 35%;
-    right: 0;
+.absolute-all-center {
+  position: absolute;
+  left: 0;
+  bottom: 35%;
+  right: 0;
 }
 
 /* Modal Menu styling */
@@ -142,21 +138,18 @@ p {
   padding: 10px;
   border-radius: 12px;
   text-align: center;
-  
 }
 
-#SELF_DECK
-{
-	position: absolute;
-	bottom: 0;
-	right: 20px;
+#SELF_DECK {
+  position: absolute;
+  bottom: 0;
+  right: 20px;
 }
 
-#OTHER_DECK
-{
-	position: absolute;
-	bottom: 0;
-	left: 20px;
+#OTHER_DECK {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
 }
 
 #game {
@@ -170,49 +163,43 @@ p {
 
 /* Animation controls */
 
-.select
-{
-	background-color: rgba(128, 128, 128, 20);
+.select {
+  background-color: rgba(128, 128, 128, 20);
 }
 
 /* Flashes for opponent moves */
 
-@keyframes flash
-{
-	0% {background-color: rgba(128, 128, 128, 20);}
+@keyframes flash {
+  0% {
+    background-color: rgba(128, 128, 128, 20);
+  }
 }
 
-.src-flash
-{
-	animation: 0.1s steps(1, jump-end) 0s flash;
+.src-flash {
+  animation: 0.1s steps(1, jump-end) 0s flash;
 }
 
-.dst-flash
-{
-	animation: 0.15s steps(1, jump-end) 0.1s flash;
+.dst-flash {
+  animation: 0.15s steps(1, jump-end) 0.1s flash;
 }
 
 /* tutorial */
 
-.hint /*queryselector*/
-{
-	margin: auto;
-	width: fit-content;
-	display:flex;
-	flex-direction: row;
+.hint /*queryselector*/ {
+  margin: auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
 }
 
-.hidden
-{
-	display: none;
+.hidden {
+  display: none;
 }
 
-.keypad
-{
-	margin: 5px;
-	padding: 5px 10px;
-	border-radius: 5px;
+.keypad {
+  margin: 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
 
-	background-color: #1b2a31;
-
+  background-color: #1b2a31;
 }
