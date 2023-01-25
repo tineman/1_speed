@@ -253,20 +253,20 @@ export default class Game {
                 }
                 break;
             case "START":
+                this.selfWantNew = delta.data.self;
+                this.otherWantNew = delta.data.other;
                 if (delta.data.self && delta.data.other) {
                     this.selfWantNew = false;
                     this.otherWantNew = false;
                     if (this.decks[CONSTANTS.OTHER_DECK].cards.length == 0 && this.decks[CONSTANTS.SELF_DECK].cards.length == 0) {
                         //When neither side can make a move
                         this.returnCards(CONSTANTS.MID_LEFT, CONSTANTS.MID_RIGHT);
-                        delta = { valid: true,
-                            operation: "SHUFFLE",
-                            data: {
-                                full: true,
-                                self: this.decks[CONSTANTS.SELF_DECK],
-                                other: this.decks[CONSTANTS.OTHER_DECK]
-                            } };
-                        this.dealHand();
+                        delta.operation = "SHUFFLE";
+                        delta.data.full = true;
+                        delta.data.self = this.decks[CONSTANTS.SELF_DECK];
+                        delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
+                        break;
+                        //this.dealHand();
                     }
                     if (this.decks[CONSTANTS.OTHER_DECK].cards.length != 0) {
                         transfer(this.decks[CONSTANTS.OTHER_DECK], this.decks[CONSTANTS.MID_LEFT]);
@@ -277,10 +277,6 @@ export default class Game {
                         this.decks[CONSTANTS.MID_RIGHT].cards[0].faceup = true;
                     }
                     break;
-                }
-                else {
-                    this.selfWantNew = delta.data.self;
-                    this.otherWantNew = delta.data.other;
                 }
         }
     }

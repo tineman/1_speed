@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>| VELOCITY |</title>
+    <link rel="icon" type="image/x-icon" href="favicon.png" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=VT323"
@@ -22,7 +23,7 @@
     </div>
 
     <div id="game">
-      <div id="OTHER_HAND" class="hand">
+      <div id="OTHER_HAND" class="absolute-hor-center top hand">
         <div id="OTHER_D" class="deck">
           <canvas width="144" height="176" id="0" class="card">
             [ALT TEXT]
@@ -49,7 +50,7 @@
           </canvas>
         </div>
       </div>
-      <div id="MID_HAND" class="hand">
+      <div id="MID_HAND" class="absolute-all-center hand">
         <div id="OTHER_DECK" class="deck">
           <canvas width="144" height="176" id="5" class="card">
             [ALT TEXT]
@@ -59,11 +60,21 @@
           <canvas width="144" height="176" id="6" class="card">
             [ALT TEXT]
           </canvas>
+          <div class="hint">
+            <p id="E" class="keypad">E</p>
+            <p id="R" class="keypad">R</p>
+            <p id="T" class="keypad">T</p>
+          </div>
         </div>
         <div id="MID_RIGHT" class="deck">
           <canvas width="144" height="176" id="7" class="card">
             [ALT TEXT]
           </canvas>
+          <div class="hint">
+            <p id="Y" class="keypad">Y</p>
+            <p id="U" class="keypad">U</p>
+            <p id="I" class="keypad">I</p>
+          </div>
         </div>
         <div id="SELF_DECK" class="deck">
           <canvas width="144" height="176" id="13" class="card">
@@ -71,31 +82,46 @@
           </canvas>
         </div>
       </div>
-      <div id="SELF_HAND" class="hand">
+      <div id="SELF_HAND" class="absolute-hor-center bottom hand">
         <div id="SELF_D" class="deck">
           <canvas width="144" height="176" id="8" class="card">
             [ALT TEXT]
           </canvas>
+          <div class="hint">
+            <p id="D" class="keypad">D</p>
+          </div>
         </div>
         <div id="SELF_F" class="deck">
           <canvas width="144" height="176" id="9" class="card">
             [ALT TEXT]
           </canvas>
+          <div class="hint">
+            <p id="F" class="keypad">F</p>
+          </div>
         </div>
         <div id="SELF_G" class="deck">
           <canvas width="144" height="176" id="10" class="card">
             [ALT TEXT]
           </canvas>
+          <div class="hint">
+            <p id="G" class="keypad">G</p>
+          </div>
         </div>
         <div id="SELF_J" class="deck">
           <canvas width="144" height="176" id="11" class="card">
             [ALT TEXT]
           </canvas>
+          <div class="hint">
+            <p id="J" class="keypad">J</p>
+          </div>
         </div>
         <div id="SELF_K" class="deck">
           <canvas width="144" height="176" id="12" class="card">
             [ALT TEXT]
           </canvas>
+          <div class="hint">
+            <p id="K" class="keypad">K</p>
+          </div>
         </div>
       </div>
     </div>

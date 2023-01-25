@@ -353,6 +353,9 @@ export default class Game
 
             case "START":
 
+                this.selfWantNew = delta.data.self;
+                this.otherWantNew = delta.data.other;
+
                 if(delta.data.self && delta.data.other)
                 {
                     this.selfWantNew = false;
@@ -363,15 +366,13 @@ export default class Game
                         //When neither side can make a move
                         this.returnCards(CONSTANTS.MID_LEFT, CONSTANTS.MID_RIGHT); 
 
-                        delta = {valid: true,
-                            operation: "SHUFFLE",
-                            data: {
-                                full: true,
-                                self: this.decks[CONSTANTS.SELF_DECK],
-                                other: this.decks[CONSTANTS.OTHER_DECK]
-                            }};
+                        delta.operation = "SHUFFLE";
+                        delta.data.full = true;
+                        delta.data.self = this.decks[CONSTANTS.SELF_DECK];
+                        delta.data.other = this.decks[CONSTANTS.OTHER_DECK];
 
-                        this.dealHand();
+                        break;
+                        //this.dealHand();
                     }
 
                     if(this.decks[CONSTANTS.OTHER_DECK].cards.length != 0)
@@ -389,11 +390,7 @@ export default class Game
                     break;
 
                 }
-                else
-                {
-                    this.selfWantNew = delta.data.self;
-                    this.otherWantNew = delta.data.other;
-                }
+
         }
     }
 

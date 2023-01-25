@@ -1,4 +1,5 @@
-import { updateHTML } from "./animation.js";
+import { updateFlash, updateHTML, updateSelect } from "./animation.js";
+import { isValid } from "./card.js";
 import { CONSTANTS } from "./constants.js";
 import Game from "./game.js";
 import "./keypress.js"
@@ -53,6 +54,7 @@ function sendMoveToServer(src:number, dst:number)
 
 /**
  * Deceides if the input is a player flipping cards or if it is a player moving cards
+ * Also contains quality of life improvements
  * @param key The key the player pressed
  */
 function playerInputControl(key:string)
@@ -61,28 +63,104 @@ function playerInputControl(key:string)
 
     if(hold)
     {
+        //prevents the user from making a move with no source
         if(srcindex === -1)
         {
             srcindex = newindex;
+            update(null, srcindex);
             return;
         }
 
-        //Prevents the controller retaining a middle deck as a source
+        //Prevents the controller from using a middle deck as a source
         if((srcindex === CONSTANTS.MID_LEFT || srcindex === CONSTANTS.MID_RIGHT) && (newindex < CONSTANTS.MID_LEFT || newindex > CONSTANTS.MID_RIGHT))
         {
             srcindex = newindex;
+            update(null, srcindex);
             return;
         }
-        
+
+        let delta = game.move(role, srcindex, newindex)
+        //If the player is going to make an invalid move, change the source instead
+        if(!(delta.valid))
+        {
+            srcindex = newindex;
+            update(null, srcindex);
+            return;
+        }
+
+        //prevents the player from flipping a card when holding space
+        if(delta.operation === "FLIP")
+        {
+            srcindex = -1;
+            update(null, srcindex);
+            return;
+        }
+
         sendMoveToServer(srcindex, newindex);
         srcindex = -1;
-        
+        update(null, srcindex);
+
     }
     else
     {
         sendMoveToServer(newindex, newindex);
     }
 }
+
+
+
+
+//testing listner
+//@ts-ignore
+var test_listener = new window.keypress.Listener();
+//test_listener.simple_combo("shift", wrapper);
+
+
+/**
+ * Adding listeners to keys
+ */
+listener.register_combo({
+    "keys": "space",
+    "on_keydown": (event, combo, autorepeat) => {
+        hold = true;
+    },
+    "on_keyup": (event, combo, autorepeat) => {
+        srcindex = -1;
+        update(null, srcindex);
+        hold = false;
+    },
+    "prevent_repeat": true
+});
+
+listener.register_combo({
+    "keys": "enter",
+    "on_keydown": (event, combo, autorepeat) => {
+        console.log("ENTER");
+        playerInputControl("ENTER");
+    },
+    
+    "prevent_repeat": true
+});
+
+let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"]; //attach event listeners and change class on keydown and up
+
+for(let key of valid_keys)
+{
+
+    listener.register_combo({
+        "keys": key.toLowerCase(),
+        "on_keydown": (event, combo, autorepeat) => {
+            playerInputControl(key);
+        },
+        
+        "prevent_repeat": true
+    });
+
+}
+
+listener.stop_listening();
+
+// --------------------------- \\
 
 /**
  * Returns the user from a game to the main menu
@@ -107,54 +185,34 @@ function modalMessage(message:string)
     document.getElementById("modal-message")!.innerText = message;
 }
 
-
-//testing listner
-//@ts-ignore
-var test_listener = new window.keypress.Listener();
-//test_listener.simple_combo("shift", wrapper);
-
-
-/**
- * Adding listeners to keys
- */
-listener.register_combo({
-    "keys": "space",
-    "on_keydown": (event, combo, autorepeat) => {
-        console.log("space_down");
-        hold = true;
-    },
-    "on_keyup": (event, combo, autorepeat) => {
-        srcindex = -1;
-        console.log("space_up");
-        hold = false;
-    },
-    "prevent_repeat": true
-});
-
-listener.register_combo({
-    "keys": "enter",
-    "on_keydown": (event, combo, autorepeat) => {
-        console.log("ENTER");
-        playerInputControl("ENTER");
-    },
-    
-    "prevent_repeat": true
-});
-
-let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"];
-
-for(let key of valid_keys)
-{
-    listener.simple_combo(key.toLowerCase(), () => {
-        console.log(`${key} registered!`);
-        playerInputControl(key);
-    });
-}
-
-listener.stop_listening();
-
 // --------------------------- \\
 
+/**
+ * Wrapper function to update HTML
+ */
+function update(delta = null, index = -1)
+{
+
+    //Update the margin.
+    let indicies = [index]
+    if(game.getOtherWant) indicies.push(5)
+    else indicies.push(-1);
+
+    if(game.getSelfWant) indicies.push(13);
+    else indicies.push(-1);
+    
+    updateSelect(indicies, role)
+
+    //update html
+
+    updateHTML(game.getState(), role);
+
+    //update flashes (if needed)
+
+    updateFlash(delta, role);
+}
+
+// --------------------------- \\
 /**
  * Runs when Create Game is clicked. Requests the server to create a game and prints output on the button
  */
@@ -209,11 +267,7 @@ socket.on("receive_move", (delta) => {
     });
     game.printState();
     
-    let gameState = game.getState();
-    for(let i = 0; i < 14; i++)
-    {
-        updateHTML(i, gameState[i]);
-    }
+    update(delta);
     
 })
 
@@ -227,7 +281,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     //start_game   ------------------------------ \\
     //Client: Hide menu and show gamediv, receive gamestate, start game internally
 
-    gamediv!.style.display = "flex";
+    gamediv!.style.display = "block";
     menudiv!.style.display = "none";
 
     role = assignedRole[socket.id];
@@ -237,11 +291,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     game.parse({valid: true, operation: "START", data: {self: true, other: true}}, () => {});
     game.printState();
     
-    let gameState = game.getState();
-    for(let i = 0; i < 14; i++)
-    {
-        updateHTML(i, gameState[i]);
-    }
+    update();
 
     //
 
