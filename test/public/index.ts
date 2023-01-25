@@ -1,5 +1,4 @@
 import { updateFlash, updateHTML, updateSelect } from "./animation.js";
-import { isValid } from "./card.js";
 import { CONSTANTS } from "./constants.js";
 import Game from "./game.js";
 import "./keypress.js"
@@ -173,6 +172,7 @@ function backToMenu()
     create_game!.style.display = "inline-block";
     game_id!.style.display = "none";
     join_info!.innerHTML = "";
+    document.getElementById("tutorial")!.style.display = "block";
 }
 
 /**
@@ -250,6 +250,30 @@ document.getElementById("modal-return")!.addEventListener("click", (e) => {
     backToMenu();
 });
 
+/**
+ * Toggles the control hints in gamediv
+ */
+const assist_button = document.getElementById("assist");
+assist_button!.addEventListener("click", (e) =>
+{
+    e.preventDefault();
+    let toggleOn = assist_button?.classList.contains("dark-blue-back");
+    document.querySelectorAll(".hint").forEach((hint) => 
+    {
+        if(toggleOn)
+        {
+            assist_button?.classList.remove("dark-blue-back");
+            assist_button?.classList.add("light-blue-back");
+            hint.classList.add("hidden");
+        }
+        else
+        {
+            assist_button?.classList.add("dark-blue-back");
+            assist_button?.classList.remove("light-blue-back");
+            hint.classList.remove("hidden");
+        }
+    });
+});
 
 /**
  * Reponds to the server broadcasting a move.
@@ -283,6 +307,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
 
     gamediv!.style.display = "block";
     menudiv!.style.display = "none";
+    document.getElementById("tutorial")!.style.display = "none";
 
     role = assignedRole[socket.id];
 
@@ -299,3 +324,8 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     
 // ------------------------------------------ \\
 });
+
+socket.on("disconnect", () =>
+{
+    modalMessage("Game disconnected.");
+})

@@ -105,7 +105,7 @@ listener.register_combo({
     },
     "prevent_repeat": true
 });
-let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"];
+let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"]; //attach event listeners and change class on keydown and up
 for (let key of valid_keys) {
     listener.register_combo({
         "keys": key.toLowerCase(),
@@ -127,6 +127,7 @@ function backToMenu() {
     create_game.style.display = "inline-block";
     game_id.style.display = "none";
     join_info.innerHTML = "";
+    document.getElementById("tutorial").style.display = "block";
 }
 /**
  * Opens a modal box with the message message
@@ -190,6 +191,26 @@ document.getElementById("modal-return").addEventListener("click", (e) => {
     backToMenu();
 });
 /**
+ * Toggles the control hints in gamediv
+ */
+const assist_button = document.getElementById("assist");
+assist_button.addEventListener("click", (e) => {
+    e.preventDefault();
+    let toggleOn = assist_button === null || assist_button === void 0 ? void 0 : assist_button.classList.contains("dark-blue-back");
+    document.querySelectorAll(".hint").forEach((hint) => {
+        if (toggleOn) {
+            assist_button === null || assist_button === void 0 ? void 0 : assist_button.classList.remove("dark-blue-back");
+            assist_button === null || assist_button === void 0 ? void 0 : assist_button.classList.add("light-blue-back");
+            hint.classList.add("hidden");
+        }
+        else {
+            assist_button === null || assist_button === void 0 ? void 0 : assist_button.classList.add("dark-blue-back");
+            assist_button === null || assist_button === void 0 ? void 0 : assist_button.classList.remove("light-blue-back");
+            hint.classList.remove("hidden");
+        }
+    });
+});
+/**
  * Reponds to the server broadcasting a move.
  */
 socket.on("receive_move", (delta) => {
@@ -213,6 +234,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     //Client: Hide menu and show gamediv, receive gamestate, start game internally
     gamediv.style.display = "block";
     menudiv.style.display = "none";
+    document.getElementById("tutorial").style.display = "none";
     role = assignedRole[socket.id];
     game = new Game(gameid);
     game.parse(delta, () => { });
@@ -222,4 +244,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     //
     listener.listen();
     // ------------------------------------------ \\
+});
+socket.on("disconnect", () => {
+    modalMessage("Game disconnected.");
 });
