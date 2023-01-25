@@ -1,5 +1,4 @@
 import { updateFlash, updateHTML, updateSelect } from "./animation.js";
-import { isValid } from "./card.js";
 import { CONSTANTS } from "./constants.js";
 import Game from "./game.js";
 import "./keypress.js"
@@ -16,16 +15,18 @@ const game_id = document.getElementById("game-id");
 const join_info = <HTMLInputElement>document.getElementById("join_info");
 const join = document.getElementById("join");
 
-// ---------- Listeners ------ \\
+// ---------- Listeners and Move Handlers ------ \\
 
-var srcindex = -1; //srcindex remembers the last index that was inputted when hold was true
+//srcindex remembers the last index that was inputted when hold was true
+var srcindex = -1;
+//True iff spacebar is down. Changes the input method from flip to move.
 var hold = false; 
 
 var game:Game;
 var role:string;
 
 //@ts-ignore
-var listener = new window.keypress.Listener(); //stop_listening when the game is empty
+var listener = new window.keypress.Listener();
 
 /**
  * Validates move and sends a request to the server for the corrresponding move
@@ -44,7 +45,7 @@ function sendMoveToServer(src:number, dst:number)
             if(!status)
             {
                 //Fails, add sound effect and card retraction effect
-                console.log(`Move from ${src} to ${dst} has failed.`);
+                console.warn(`Move from ${src} to ${dst} has failed.`);
             }
             
         });
@@ -107,15 +108,6 @@ function playerInputControl(key:string)
     }
 }
 
-
-
-
-//testing listner
-//@ts-ignore
-var test_listener = new window.keypress.Listener();
-//test_listener.simple_combo("shift", wrapper);
-
-
 /**
  * Adding listeners to keys
  */
@@ -135,7 +127,6 @@ listener.register_combo({
 listener.register_combo({
     "keys": "enter",
     "on_keydown": (event, combo, autorepeat) => {
-        console.log("ENTER");
         playerInputControl("ENTER");
     },
     
@@ -160,7 +151,7 @@ for(let key of valid_keys)
 
 listener.stop_listening();
 
-// --------------------------- \\
+// -------------- Helper functions to navigate site ------------- \\
 
 /**
  * Returns the user from a game to the main menu
@@ -173,6 +164,7 @@ function backToMenu()
     create_game!.style.display = "inline-block";
     game_id!.style.display = "none";
     join_info!.innerHTML = "";
+    document.getElementById("tutorial")!.style.display = "block";
 }
 
 /**
@@ -185,7 +177,7 @@ function modalMessage(message:string)
     document.getElementById("modal-message")!.innerText = message;
 }
 
-// --------------------------- \\
+// -------------- Update HTML interface ------------- \\
 
 /**
  * Wrapper function to update HTML
@@ -212,44 +204,70 @@ function update(delta = null, index = -1)
     updateFlash(delta, role);
 }
 
-// --------------------------- \\
+// -------------- Attach listeners to DOM elements ------------- \\
 /**
  * Runs when Create Game is clicked. Requests the server to create a game and prints output on the button
  */
-create_game!.addEventListener("click", (e) => {
-    e.preventDefault();
-    console.log("create_game");
 
-    socket.emit("create_game", (response) => {
-        if(response.status)
+window.onload = function ()
+{
+    create_game!.addEventListener("click", (e) => {
+        e.preventDefault();
+        socket.emit("create_game", (response) => {
+            if(response.status)
+            {
+                game_id!.style.display = "block";
+                create_game!.style.display = "none";
+                game_id!.innerText = `GameID: ${response.msg}`;
+            }
+        });
+    });
+
+    /**
+     * Requests server to join a game with the givenID
+     */
+    join!.addEventListener("submit", (e) => {
+        e.preventDefault();
+        socket.emit("join_game", join_info!.value, (response) => {});
+    });
+
+    /**
+     * Returns the user from a game to the main menu
+     */
+    document.getElementById("modal-return")!.addEventListener("click", (e) => {
+        e.preventDefault();
+        backToMenu();
+    });
+
+    /**
+     * Toggles the control hints in gamediv
+     */
+    const assist_button = document.getElementById("assist");
+    assist_button!.addEventListener("click", (e) =>
+    {
+        e.preventDefault();
+        let toggleOn = assist_button?.classList.contains("dark-blue-back");
+        document.querySelectorAll(".hint").forEach((hint) => 
         {
-            game_id!.style.display = "block";
-            create_game!.style.display = "none";
-            game_id!.innerText = `GameID: ${response.msg}`;
-        }
+            if(toggleOn)
+            {
+                assist_button?.classList.remove("dark-blue-back");
+                assist_button?.classList.add("light-blue-back");
+                hint.classList.add("hidden");
+            }
+            else
+            {
+                assist_button?.classList.add("dark-blue-back");
+                assist_button?.classList.remove("light-blue-back");
+                hint.classList.remove("hidden");
+            }
+        });
     });
-});
+}
 
-/**
- * Requests server to join a game with the givenID
- */
-join!.addEventListener("submit", (e) => {
-    e.preventDefault();
-    console.log("join!");
 
-    socket.emit("join_game", join_info!.value, (response) => {
-        console.log(response.status); //placeholder code, the server should start a new game when a player joins
-    });
-});
 
-/**
- * Returns the user from a game to the main menu
- */
-document.getElementById("modal-return")!.addEventListener("click", (e) => {
-    e.preventDefault();
-    backToMenu();
-});
-
+// -------------------- Sockets - communicate with the server ---------------------- \\
 
 /**
  * Reponds to the server broadcasting a move.
@@ -271,8 +289,6 @@ socket.on("receive_move", (delta) => {
     
 })
 
-// ------------------------------------------ \\
-
 /**
  * Responds to the server broadcasting a new game. Hides the menu, initializes the game and starts the game.
  */
@@ -283,6 +299,7 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
 
     gamediv!.style.display = "block";
     menudiv!.style.display = "none";
+    document.getElementById("tutorial")!.style.display = "none";
 
     role = assignedRole[socket.id];
 
@@ -299,3 +316,8 @@ socket.on("start_game", (delta, gameid, assignedRole) => {
     
 // ------------------------------------------ \\
 });
+
+socket.on("disconnect", () =>
+{
+    modalMessage("Game disconnected.");
+})
