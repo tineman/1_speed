@@ -142,7 +142,7 @@ listener.register_combo({
     "prevent_repeat": true
 });
 
-let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"];
+let valid_keys = ["E", "R", "T", "Y", "U", "I", "D", "F", "G", "H", "J", "K"]; //attach event listeners and change class on keydown and up
 
 for(let key of valid_keys)
 {

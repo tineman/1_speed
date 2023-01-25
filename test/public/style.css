@@ -64,9 +64,8 @@ p {
 {
 	position: absolute;
     left: 0;
-    bottom: 40%;
+    bottom: 35%;
     right: 0;
-	padding: 20px;
 }
 
 /* Modal Menu styling */
@@ -142,6 +141,8 @@ p {
   margin: 0px 10px;
   padding: 10px;
   border-radius: 12px;
+  text-align: center;
+  
 }
 
 #SELF_DECK
@@ -191,3 +192,27 @@ p {
 	animation: 0.15s steps(1, jump-end) 0.1s flash;
 }
 
+/* tutorial */
+
+.hint /*queryselector*/
+{
+	margin: auto;
+	width: fit-content;
+	display:flex;
+	flex-direction: row;
+}
+
+.hidden
+{
+	display: none;
+}
+
+.keypad
+{
+	margin: 5px;
+	padding: 5px 10px;
+	border-radius: 5px;
+
+	background-color: #1b2a31;
+
+}
