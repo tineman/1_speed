@@ -2,6 +2,8 @@
 
 An implementation of the card game [Speed](https://en.wikipedia.org/wiki/Speed_(card_game)) online using the keyboard as player input for a better user experience.
 
+![](./speed.gif)
+
 [Click me to play](https://1speed.tinman1.repl.co/)
 
 
