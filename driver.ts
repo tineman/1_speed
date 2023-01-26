@@ -190,6 +190,7 @@ io.on("connection", (socket) => { //when joining or creating a game, they should
         {
             game.parse(delta, () => {
                 console.log(`Winner in game ${gameID}`);
+                io.to(gameID).emit("receive_move", delta);
                 io.socketsLeave(gameID);
                 deleteGame(gameID);
             });
