@@ -136,6 +136,7 @@ io.on("connection", (socket) => {
         if (delta.valid) {
             game.parse(delta, () => {
                 console.log(`Winner in game ${gameID}`);
+                io.to(gameID).emit("receive_move", delta);
                 io.socketsLeave(gameID);
                 deleteGame(gameID);
             });
